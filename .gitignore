@@ -110,7 +110,7 @@ ENV/
 data/
 input/
 saved/
-datasets/
+dataset/
 /data.tar.gz
 ._data
 
