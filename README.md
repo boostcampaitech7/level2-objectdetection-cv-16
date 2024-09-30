@@ -3,7 +3,9 @@
 
 # 1. Project Overview (프로젝트 개요)
 - 재활용 품목 분류를 위한 Object Detection
+
 ![이미지](https://github.com/user-attachments/assets/b2b5a53b-ca33-4f29-8af0-0c8d2392e602)
+
 - Input : 쓰레기 객체가 담긴 이미지가 모델의 인풋으로 사용됩니다. 또한 bbox 정보(좌표, 카테고리)는 model 학습 시 사용이 됩니다. bbox annotation은 COCO format으로 제공됩니다. (COCO format에 대한 설명은 학습 데이터 개요를 참고해주세요.)
 - Output : 모델은 bbox 좌표, 카테고리, score 값을 리턴합니다. 이를 submission 양식에 맞게 csv 파일을 만들어 제출합니다. (submission format에 대한 설명은 평가방법을 참고해주세요.)
 
