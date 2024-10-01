@@ -50,7 +50,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.time = now.strftime('%Y-%m-%d_%H.%M.%S')
         self.checkpoint_path = os.path.join(self.result_path, self.time)
         os.makedirs(self.checkpoint_path, exist_ok=True)
-
+        
     def train_epoch(self, train_loader: DataLoader) -> float:
         # 한 에폭 동안의 훈련을 진행
         self.model.train()
@@ -187,7 +187,7 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 if __name__=='__main__':
-        ## device와 seed 설정
+    ## device와 seed 설정
     from util.augmentation import TransformSelector
     from util.data import CustomDataset
     import torchvision
