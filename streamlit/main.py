@@ -8,16 +8,16 @@ LABEL_COLORS = ['rgb(208, 56, 78)', 'rgb(238, 100, 69)', 'rgb(250, 155, 88)', 'r
 LABEL_COLORS_WOUT_NO_FINDING = LABEL_COLORS[:8]+LABEL_COLORS[9:]
 CLASSES = ["General trash", "Paper", "Paper pack", "Metal", "Glass", "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing"]
 class_colors = {
-    'General trash': (255, 0, 0), 
-    'Paper': (0, 255, 0),
-    'Paper pack': (0, 0, 255),
-    'Metal': (255, 255, 0),
-    'Glass': (0, 255, 255),
-    'Plastic': (255, 0, 255),
-    'Styrofoam': (128, 0, 0),
-    'Plastic bag': (0, 128, 0),
-    'Battery': (0, 0, 128),
-    'Clothing': (128, 128, 0)
+    'General trash': (208, 56, 78), 
+    'Paper': (238, 100, 69),
+    'Paper pack': (250, 155, 88),
+    'Metal': (254, 206, 124),
+    'Glass': (255, 241, 168),
+    'Plastic': (244, 250, 173),
+    'Styrofoam': (209, 237, 156),
+    'Plastic bag': (151, 213, 164),
+    'Battery': (92, 183, 170),
+    'Clothing': (54, 130, 186)
 }
 
 @st.cache_data
@@ -92,7 +92,6 @@ def load_test_df(csv_path):
 
         for i in range(0, len(predictions), 6):
             class_id_value = int(predictions[i])
-            score = predictions[i + 1]
             x_min_value = predictions[i + 2]
             y_min_value = predictions[i + 3]
             x_max_value = predictions[i + 4]
@@ -122,7 +121,7 @@ st.sidebar.success("CV16 오늘도 화이팅하조!")
 menu = st.sidebar.radio("메뉴", ["데이터 분포 확인하기", "객체 탐지 확인하기"])
 
 if "test_df" not in st.session_state:
-    st.session_state.test_df = pd.DataFrame()
+    st.session_state.test_df = pd.DataFrame({"image_id": [f"test/{str(i).zfill(4)}.jpg" for i in range(4871)]})
 
 train_df, bbox_df = load_train_df()
 
@@ -135,7 +134,7 @@ elif menu == "객체 탐지 확인하기":
     if option == "train images":
         image_count = st.sidebar.slider('Select image count', 1, 8, 4)
         image_id = st.sidebar.slider('Select image id', 0, len(train_df.groupby("image_id")) - (5 * image_count), 0)
-        st.sidebar.write('image_id:', image_id)
+        st.sidebar.write('image id:', image_id)
         for i in range(image_id, image_id + 5 * image_count, image_count):
             image_ids = [f"train/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
             detector.show(train_df, image_ids, class_colors)
@@ -143,16 +142,16 @@ elif menu == "객체 탐지 확인하기":
         with st.sidebar.form(key="form"):
             csv_path = st.text_input("CSV 파일 경로")
             submit_button = st.form_submit_button("적용")
-        if st.session_state.test_df.empty:
-            if submit_button and csv_path:
+        if submit_button and csv_path:
+            try:
                 st.session_state.test_df = load_test_df(csv_path)
                 st.sidebar.success("CSV 파일을 불러오는데 성공했습니다.")
-            else:
+            except Exception:
                 st.sidebar.error("CSV 파일이 비어 있거나 오류가 발생했습니다.")
-                st.stop()
+
         image_count = st.sidebar.slider('Select image count', 1, 8, 4)
-        image_id = st.sidebar.slider('Select image id', 0, len(st.session_state.test_df.groupby("image_id")) - (5 * image_count), 0)
-        st.sidebar.write('image_id:', image_id)
+        image_id = st.sidebar.slider('Select image id', 0, st.session_state.test_df["image_id"].nunique() - (5 * image_count), 0)
+        st.sidebar.write('image id:', image_id)
         for i in range(image_id, image_id + 5 * image_count, image_count):
             image_ids = [f"test/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
             detector.show(st.session_state.test_df, image_ids, class_colors)

@@ -2,7 +2,6 @@ import streamlit as st
 import plotly.express as px
 
 def show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES):
-    st.header("재활용 쓰레기 데이터 시각화")
     fig_hist = px.histogram(
         train_df.image_id.value_counts(), 
         log_y=True, 
