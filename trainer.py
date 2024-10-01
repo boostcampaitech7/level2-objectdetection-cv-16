@@ -126,7 +126,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
                 ## checkpoint 저장 코드
                 checkpoint_name = f'cp_epoch{epoch + 1}_train_loss{train_loss:.4f}_val_loss{val_loss:.4f}.pth'
                 self.save_checkpoint(path=self.checkpoint_path, name=checkpoint_name, epoch=epoch+1, train_loss=train_loss)
-                self.keep_topN_checkpoints(n=3)
+                self.keep_top_k_checkpoints(n=3)
             else:
                 count += 1
                 assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
@@ -160,7 +160,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.best_epochs.appendleft([checkpoint_path])
         print(f"Checkpoint saved at {checkpoint_path}")
         
-    def keep_topN_checkpoints(self, n: int) -> None:
+    def keep_top_k_checkpoints(self, n: int) -> None:
         if len(self.best_epochs) > n:
             rm_checkpoint = self.best_epochs.pop()
             os.remove(rm_checkpoint[1])
