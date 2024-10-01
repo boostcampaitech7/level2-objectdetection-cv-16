@@ -11,8 +11,8 @@ from datetime import datetime
 from argparse import Namespace
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
-from util.checkpoints import save_checkpoint
 
+from collections import deque
 
 class Trainer: # 변수 넣으면 바로 학습되도록
     def __init__( # 여긴 config로 나중에 빼야하는지 이걸 유지하는지
@@ -38,13 +38,18 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.epochs = epochs  # 총 훈련 에폭 수
         self.result_path = result_path  # 모델 저장 경로
         
-        self.best_epochs = [] # 가장 좋은 상위 3개 모델의 정보를 저장할 리스트
+        self.best_epochs = deque() # 가장 좋은 상위 3개 모델의 정보를 저장할 리스트
         self.best_train_loss = float('inf')
         self.best_val_loss = float('inf')
         
         self.earlystop = None
         
         self.verbose = False
+        
+        now = datetime.now()
+        self.time = now.strftime('%Y-%m-%d_%H.%M.%S')
+        self.checkpoint_path = os.path.join(self.result_path, self.time)
+        os.makedirs(self.checkpoint_path, exist_ok=True)
 
     def train_epoch(self, train_loader: DataLoader) -> float:
         # 한 에폭 동안의 훈련을 진행
@@ -115,16 +120,20 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             print(f"Epoch {epoch+1}, Train Loss : {train_loss:.8f}, val_loss : {val_loss:.8f}")
             
             if val_loss < self.best_val_loss:
+                print(f"best validation loss updated")
                 count = 0
                 self.best_val_loss = val_loss
                 ## checkpoint 저장 코드
+                checkpoint_name = f'cp_epoch{epoch + 1}_train_loss{train_loss:.4f}_val_loss{val_loss:.4f}.pth'
+                self.save_checkpoint(path=self.checkpoint_path, name=checkpoint_name, epoch=epoch+1, train_loss=train_loss)
+                self.keep_topN_checkpoints(n=3)
             else:
                 count += 1
                 assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
                 
         ## 최종 checkpoint 저장 코드
     
-    def save_checkpoint(self, path: str, name: str, epoch: int, loss: float) -> None:
+    def save_checkpoint(self, path: str, name: str, epoch: int, train_loss: float) -> None:
         '''
         required parameters
             - path : checkpoint path
@@ -136,9 +145,26 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             - saves a checkpoint base on received parameters
             - keeps track with top 3 model (loss, name)
         '''
+        checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': self.model.state_dict(),
+        'optimizer_state_dict': self.optimizer.state_dict(),
+        'train_loss': train_loss,
+        'val_loss': self.best_val_loss 
+        }
+        if self.scheduler:
+            checkpoint['scheduler_state_dict'] = self.scheduler.state_dict()
         
+        checkpoint_path = os.path.join(path, name)
+        torch.save(checkpoint, checkpoint_path)
+        self.best_epochs.appendleft([checkpoint_path])
+        print(f"Checkpoint saved at {checkpoint_path}")
         
-        pass
+    def keep_topN_checkpoints(self, n: int) -> None:
+        if len(self.best_epochs) > n:
+            rm_checkpoint = self.best_epochs.pop()
+            os.remove(rm_checkpoint[1])
+            print(f"checkpoint removed : {rm_checkpoint[1]}")
     
     def load_settings(self) -> None:
         ## 학습 재개를 위한 모델, 옵티마이저, 스케줄러 가중치 및 설정을 불러옵니다.
@@ -151,12 +177,12 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             self.start_epoch = setting_info['epoch']
             self.model.load_state_dict(setting_info['model_state_dict'])
             self.optimizer.load_state_dict(setting_info['optimizer_state_dict'])
-            self.scheduler.load_state_dict(setting_info['scheduler_state_dict'])
+            if self.scheduler:
+                self.scheduler.load_state_dict(setting_info['scheduler_state_dict'])
             print("loading successful")
         except:
             raise Exception('학습 재개를 위한 정보를 불러오는데 문제가 발생하였습니다')
         
-    
 def collate_fn(batch):
     return tuple(zip(*batch))
 
@@ -181,9 +207,9 @@ if __name__=='__main__':
     num_classes = 1 + 10
     
     batch_size = 16
-    epochs = 3
+    epochs = 10
     
-    result_path = './temp'
+    result_path = './checkpoints'
     ## 데이터 증강 및 세팅
     transform_selector = TransformSelector(transform_type=transform_type)
     
