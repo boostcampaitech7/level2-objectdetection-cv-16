@@ -42,23 +42,9 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.best_train_loss = float('inf')
         self.best_val_loss = float('inf')
         
+        self.earlystop = None
+        
         self.verbose = False
-
-    def save_checkpoint(self, path: str, name: str, epoch: int, loss: float) -> None:
-        '''
-        required parameters
-            - path : checkpoint path
-            - name : name of the checkpoint
-            - epoch : current epoch
-            - loss : current loss
-        
-        what it does
-            - saves a checkpoint base on received parameters
-            - keeps track with top 3 model (loss, name)
-        '''
-        
-        
-        pass
 
     def train_epoch(self, train_loader: DataLoader) -> float:
         # 한 에폭 동안의 훈련을 진행
@@ -90,8 +76,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
     def validate(self, val_loader: DataLoader) -> tuple[float, float]:
         # 모델의 검증을 진행
         self.model.eval()
-        val_correct = 0
-        total_loss = 0.0
+        val_loss = 0.0
 
         progress_bar = tqdm(val_loader, desc="Validating", leave=False, disable=self.verbose)
   
@@ -100,9 +85,23 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         
         with torch.no_grad():
             for images, targets, image_ids in progress_bar:
-                pass
+                images = list(image.float().to(self.device) for image in images)
+                targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
+                
+                ## loss값을 뽑아내도록 해놓긴 했으나, eval모드에서 bbox 예측값을 가지고 처리할 수 있도록
+                ## 작성 해야함 - 추후 수정 예정
+                self.model.train()
+                loss_dict = self.model(images, targets)
+                self.model.eval()
+                
+                losses = sum(loss for loss in loss_dict.values())
+                loss_value = losses.item()
+                
+                val_loss += loss_value * val_loader.batch_size
+                progress_bar.set_postfix(loss=loss_value)
 
-        return total_loss, val_correct
+        val_loss = val_loss / val_loader.dataset.__len__()
+        return val_loss
 
     def train(self) -> None:
         # 전체 훈련 과정을 관리
@@ -111,14 +110,34 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             print(f"Epoch {epoch+1}/{self.epochs}")
 
             train_loss = self.train_epoch(self.train_loader)
+            val_loss = self.validate(self.val_loader)
             
-            print(f"Epoch {epoch+1}, Train Loss : {train_loss:.8f}")
+            print(f"Epoch {epoch+1}, Train Loss : {train_loss:.8f}, val_loss : {val_loss:.8f}")
             
-            ## checkpoint 저장 코드
-        
+            if val_loss < self.best_val_loss:
+                count = 0
+                self.best_val_loss = val_loss
+                ## checkpoint 저장 코드
+            else:
+                count += 1
+                assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
+                
         ## 최종 checkpoint 저장 코드
     
-    def save_checkpoint(self, epoch: int, val_loss: float, val_acc: float) -> None:
+    def save_checkpoint(self, path: str, name: str, epoch: int, loss: float) -> None:
+        '''
+        required parameters
+            - path : checkpoint path
+            - name : name of the checkpoint
+            - epoch : current epoch
+            - loss : current loss
+        
+        what it does
+            - saves a checkpoint base on received parameters
+            - keeps track with top 3 model (loss, name)
+        '''
+        
+        
         pass
     
     def load_settings(self) -> None:
@@ -150,7 +169,9 @@ if __name__=='__main__':
 
     device = torch.device('cuda')
 
-    annotation = './dataset/train.json'
+    train_annotation = 'dataset/5-fold_json/train_fold_1.json'
+    val_annotation = 'dataset/5-fold_json/val_fold_1.json'
+    
     data_root = './dataset'
 
     transform_type = 'albumentations'
@@ -160,19 +181,30 @@ if __name__=='__main__':
     num_classes = 1 + 10
     
     batch_size = 16
-    epochs = 10
+    epochs = 3
     
     result_path = './temp'
     ## 데이터 증강 및 세팅
     transform_selector = TransformSelector(transform_type=transform_type)
     
+    train_transform = transform_selector.get_transform(augment=True, 
+                                                       height=height, width=width)
+    val_transform = transform_selector.get_transform(augment=False, 
+                                                     height=height, width=width)
+
+    train_dataset = CustomDataset(train_annotation, data_root, transforms=train_transform)
+    val_dataset = CustomDataset(val_annotation, data_root, transforms=val_transform)
     
-    train_transform = transform_selector.get_transform(augment=True, height=height, width=width)
-
-    train_dataset = CustomDataset(annotation, data_root, transforms=train_transform)
-
     train_dataloader = DataLoader(
         train_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=0,
+        collate_fn=collate_fn
+    )
+    
+    val_dataloader = DataLoader(
+        val_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=0,
@@ -205,7 +237,7 @@ if __name__=='__main__':
         model=model,
         device=device,
         train_loader=train_dataloader,
-        val_loader=None,
+        val_loader=val_dataloader,
         optimizer=optimizer,
         scheduler=scheduler,
         loss_fn=loss,
