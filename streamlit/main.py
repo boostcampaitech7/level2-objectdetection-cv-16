@@ -118,8 +118,8 @@ def load_test_df(csv_path):
 
     return test_df
 
-st.sidebar.success("Welcome to the Predictor!")
-menu = st.sidebar.radio("Menu", ["데이터 분포 확인하기", "객체 탐지 예측하기"])
+st.sidebar.success("CV16 오늘도 화이팅하조!")
+menu = st.sidebar.radio("메뉴", ["데이터 분포 확인하기", "객체 탐지 확인하기"])
 
 if "test_df" not in st.session_state:
     st.session_state.test_df = pd.DataFrame()
@@ -127,18 +127,22 @@ if "test_df" not in st.session_state:
 train_df, bbox_df = load_train_df()
 
 if menu == "데이터 분포 확인하기":
+    st.header("데이터 분포 확인하기")
     eda.show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES)
-elif menu == "객체 탐지 예측하기":
-    option = st.sidebar.radio("Option", ["train", "test"])
-    if option == "train":
-        values = st.sidebar.slider('Select image id', 0, len(train_df.groupby("image_id")) - 10, 0)
-        st.sidebar.write('Values:', values)
-        for i in range(values, values + 10):
-            detector.show(train_df, f"train/{str(i).zfill(4)}.jpg", class_colors)
-    elif option == "test":
-        with st.sidebar.form(key="입력 form"):
-            csv_path = st.text_input("CSV path")
-            submit_button = st.form_submit_button("OK")
+elif menu == "객체 탐지 확인하기":
+    st.header("객체 탐지 확인하기")
+    option = st.sidebar.radio("옵션", ["train images", "test images"])
+    if option == "train images":
+        image_count = st.sidebar.slider('Select image count', 1, 8, 4)
+        image_id = st.sidebar.slider('Select image id', 0, len(train_df.groupby("image_id")) - (5 * image_count), 0)
+        st.sidebar.write('image_id:', image_id)
+        for i in range(image_id, image_id + 5 * image_count, image_count):
+            image_ids = [f"train/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
+            detector.show(train_df, image_ids, class_colors)
+    elif option == "test images":
+        with st.sidebar.form(key="form"):
+            csv_path = st.text_input("CSV 파일 경로")
+            submit_button = st.form_submit_button("적용")
         if st.session_state.test_df.empty:
             if submit_button and csv_path:
                 st.session_state.test_df = load_test_df(csv_path)
@@ -146,8 +150,9 @@ elif menu == "객체 탐지 예측하기":
             else:
                 st.sidebar.error("CSV 파일이 비어 있거나 오류가 발생했습니다.")
                 st.stop()
-
-        values = st.sidebar.slider('Select image id', 0, len(st.session_state.test_df.groupby("image_id")) - 10, 0)
-        st.sidebar.write('Values:', values)
-        for i in range(values, values + 10):
-            detector.show(st.session_state.test_df, f"test/{str(i).zfill(4)}.jpg", class_colors)
+        image_count = st.sidebar.slider('Select image count', 1, 8, 4)
+        image_id = st.sidebar.slider('Select image id', 0, len(st.session_state.test_df.groupby("image_id")) - (5 * image_count), 0)
+        st.sidebar.write('image_id:', image_id)
+        for i in range(image_id, image_id + 5 * image_count, image_count):
+            image_ids = [f"test/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
+            detector.show(st.session_state.test_df, image_ids, class_colors)
