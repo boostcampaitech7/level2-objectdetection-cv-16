@@ -4,9 +4,6 @@ import pandas as pd
 import streamlit as st
 from pycocotools.coco import COCO
 
-st.sidebar.success("Welcome to the Predictor!")
-menu = st.sidebar.radio("Menu", ["데이터 분포 확인하기", "객체 탐지 예측하기"])
-
 LABEL_COLORS = ['rgb(208, 56, 78)', 'rgb(238, 100, 69)', 'rgb(250, 155, 88)', 'rgb(254, 206, 124)', 'rgb(255, 241, 168)', 'rgb(244, 250, 173)', 'rgb(209, 237, 156)', 'rgb(151, 213, 164)', 'rgb(92, 183, 170)', 'rgb(54, 130, 186)']
 LABEL_COLORS_WOUT_NO_FINDING = LABEL_COLORS[:8]+LABEL_COLORS[9:]
 CLASSES = ["General trash", "Paper", "Paper pack", "Metal", "Glass", "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing"]
@@ -121,8 +118,13 @@ def load_test_df(csv_path):
 
     return test_df
 
+st.sidebar.success("Welcome to the Predictor!")
+menu = st.sidebar.radio("Menu", ["데이터 분포 확인하기", "객체 탐지 예측하기"])
+
+if "test_df" not in st.session_state:
+    st.session_state.test_df = pd.DataFrame()
+
 train_df, bbox_df = load_train_df()
-test_df = load_test_df("./baseline/submission_ensemble.csv")
 
 if menu == "데이터 분포 확인하기":
     eda.show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES)
@@ -137,16 +139,15 @@ elif menu == "객체 탐지 예측하기":
         with st.sidebar.form(key="입력 form"):
             csv_path = st.text_input("CSV path")
             submit_button = st.form_submit_button("OK")
-
+        if st.session_state.test_df.empty:
             if submit_button and csv_path:
-                test_df = load_test_df(csv_path)
+                st.session_state.test_df = load_test_df(csv_path)
+                st.sidebar.success("CSV 파일을 불러오는데 성공했습니다.")
+            else:
+                st.sidebar.error("CSV 파일이 비어 있거나 오류가 발생했습니다.")
+                st.stop()
 
-                if not test_df.empty:
-                    st.success("CSV 파일을 불러오는데 성공했습니다.")
-                else:
-                    st.error("CSV 파일이 비어 있거나 오류가 발생했습니다.")
-
-        values = st.sidebar.slider('Select image id', 0, len(test_df.groupby("image_id")) - 10, 0)
+        values = st.sidebar.slider('Select image id', 0, len(st.session_state.test_df.groupby("image_id")) - 10, 0)
         st.sidebar.write('Values:', values)
         for i in range(values, values + 10):
-            detector.show(test_df, f"test/{str(i).zfill(4)}.jpg", class_colors)
+            detector.show(st.session_state.test_df, f"test/{str(i).zfill(4)}.jpg", class_colors)
