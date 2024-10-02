@@ -179,6 +179,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             self.optimizer.load_state_dict(setting_info['optimizer_state_dict'])
             if self.scheduler:
                 self.scheduler.load_state_dict(setting_info['scheduler_state_dict'])
+            self.best_val_loss = setting_info['val_loss']
             print("loading successful")
         except:
             raise Exception('학습 재개를 위한 정보를 불러오는데 문제가 발생하였습니다')
