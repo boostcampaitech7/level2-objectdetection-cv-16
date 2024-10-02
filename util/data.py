@@ -2,12 +2,12 @@ from pycocotools.coco import COCO
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import KFold
 import numpy as np
+from numpy import ndarray
 import cv2
 import torch
 import os
 import json
 import random
-
 
 class CustomDataset(Dataset):
     '''
@@ -15,20 +15,24 @@ class CustomDataset(Dataset):
       transforms: data transform (resize, crop, Totensor, etc,,,)
     '''
 
-    def __init__(self, annotation, data_dir, transforms=None):
+    def __init__(self, annotation: str, data_dir: str, transforms=None, is_train: bool=True):
         super().__init__()
         self.data_dir = data_dir
         # coco annotation 불러오기 (coco API)
         self.coco = COCO(annotation)
-        self.predictions = {
-            "images": self.coco.dataset["images"].copy(),
-            "categories": self.coco.dataset["categories"].copy(),
-            "annotations": None
-        }
-        self.transforms = transforms
+        
+        if is_train:
+            self.predictions = {
+                "images": self.coco.dataset["images"].copy(),
+                "categories": self.coco.dataset["categories"].copy(),
+                "annotations": None
+            }
+            self.transforms = transforms
+            
         self.image_id = self.coco.getImgIds()
+        self.is_train=is_train
 
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> tuple[ndarray, dict[ndarray]]:
         
         image_id = self.image_id[index]
 
@@ -41,41 +45,45 @@ class CustomDataset(Dataset):
         ann_ids = self.coco.getAnnIds(imgIds=image_info['id'])
         anns = self.coco.loadAnns(ann_ids)
 
-        boxes = np.array([x['bbox'] for x in anns])
+        if self.is_train:
+            boxes = np.array([x['bbox'] for x in anns])
 
-        # boxex (x_min, y_min, x_max, y_max)
-        boxes[:, 2] = boxes[:, 0] + boxes[:, 2]
-        boxes[:, 3] = boxes[:, 1] + boxes[:, 3]
-        
-        # torchvision faster_rcnn은 label=0을 background로 취급
-        # class_id를 1~10으로 수정 
-        labels = np.array([x['category_id']+1 for x in anns]) 
-        labels = torch.as_tensor(labels, dtype=torch.int64)
-        
-        areas = np.array([x['area'] for x in anns])
-        areas = torch.as_tensor(areas, dtype=torch.float32)
-                                
-        is_crowds = np.array([x['iscrowd'] for x in anns])
-        is_crowds = torch.as_tensor(is_crowds, dtype=torch.int64)
+            # boxex (x_min, y_min, x_max, y_max)
+            boxes[:, 2] = boxes[:, 0] + boxes[:, 2]
+            boxes[:, 3] = boxes[:, 1] + boxes[:, 3]
+            
+            # torchvision faster_rcnn은 label=0을 background로 취급
+            # class_id를 1~10으로 수정 
+            labels = np.array([x['category_id']+1 for x in anns]) 
+            labels = torch.as_tensor(labels, dtype=torch.int64)
+            
+            areas = np.array([x['area'] for x in anns])
+            areas = torch.as_tensor(areas, dtype=torch.float32)
+                                    
+            is_crowds = np.array([x['iscrowd'] for x in anns])
+            is_crowds = torch.as_tensor(is_crowds, dtype=torch.int64)
 
-        target = {'boxes': boxes, 'labels': labels, 'image_id': torch.tensor([index]), 'area': areas,
-                  'iscrowd': is_crowds}
+            target = {'boxes': boxes, 'labels': labels, 'image_id': torch.tensor([index]), 'area': areas,
+                    'iscrowd': is_crowds}
 
-        # transform
-        if self.transforms:
-            sample = {
-                'image': image,
-                'bboxes': target['boxes'],
-                'labels': labels
-            }
-            sample = self.transforms(**sample)
-            image = sample['image']
-            target['boxes'] = torch.tensor(sample['bboxes'], dtype=torch.float32)
-
-        return image, target, image_id
+            # transform
+            if self.transforms:
+                sample = {
+                    'image': image,
+                    'bboxes': target['boxes'],
+                    'labels': labels
+                }
+                sample = self.transforms(**sample)
+                image = sample['image']
+                target['boxes'] = torch.tensor(sample['bboxes'], dtype=torch.float32)
+            
+            return image, target, image_id
+        else:
+            image = torch.tensor(image, dtype=torch.float32).permute(2,0,1)
+            return image
     
     def __len__(self) -> int:
-        return len(self.coco.getImgIds())
+        return len(self.image_id)
     
 def get_kfold_json(
     k:int = 5, 
@@ -118,7 +126,6 @@ def kfold_split_json(
     train_kfold_paths = []
     val_kfold_paths = []
 
-
     for fold, (train_idx, val_idx) in enumerate(folds):
         train_img_ids = [img_ids[i] for i in train_idx]
         val_img_ids = [img_ids[i] for i in val_idx]
@@ -133,7 +140,6 @@ def kfold_split_json(
         print(f'Fold {fold+1}:')
         print(f'Training images: {len(train_img_ids)}, Validation images: {len(val_img_ids)}')
         
-    
     return zip(train_kfold_paths, val_kfold_paths)
     
 def create_subset_json(coco, img_ids, output_json):
@@ -156,5 +162,4 @@ def create_subset_json(coco, img_ids, output_json):
         
 # if __name__=="__main__":
 #     random.seed(2024)
-#     a = get_kfold_json()
-#     print(*a, sep='\n')
+#     a = get_kfold_json(k=2)

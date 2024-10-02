@@ -26,6 +26,11 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         loss_fn: torch.nn.modules.loss._Loss, 
         epochs: int,
         result_path: str,
+        topk: int,
+        earlystop: int, 
+        resume: bool,
+        resume_model_path: str,
+        log_info: dict[str, str],
     ):
         # 클래스 초기화: 모델, 디바이스, 데이터 로더 등 설정
         self.model = model  # 훈련할 모델
@@ -38,11 +43,16 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.epochs = epochs  # 총 훈련 에폭 수
         self.result_path = result_path  # 모델 저장 경로
         
-        self.best_epochs = deque() # 가장 좋은 상위 3개 모델의 정보를 저장할 리스트
+        self.k = topk
+        
+        self.resume = resume
+        self.resume_model_path = resume_model_path
+        
+        self.best_models = deque() # 가장 좋은 상위 3개 모델의 정보를 저장할 리스트
         self.best_train_loss = float('inf')
         self.best_val_loss = float('inf')
         
-        self.earlystop = None
+        self.earlystop = earlystop
         
         self.verbose = False
         
@@ -51,6 +61,8 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.checkpoint_path = os.path.join(self.result_path, self.time)
         os.makedirs(self.checkpoint_path, exist_ok=True)
         
+        self.save_exp_settings(log_info, self.checkpoint_path)
+            
     def train_epoch(self, train_loader: DataLoader) -> float:
         # 한 에폭 동안의 훈련을 진행
         self.model.train()
@@ -109,9 +121,11 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         return val_loss
 
     def train(self) -> None:
+        if self.resume:
+            self.load_settings()
         # 전체 훈련 과정을 관리
         count = 0
-        for epoch in range(self.epochs):
+        for epoch in range(self.start_epoch, self.epochs):
             print(f"Epoch {epoch+1}/{self.epochs}")
 
             train_loss = self.train_epoch(self.train_loader)
@@ -126,7 +140,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
                 ## checkpoint 저장 코드
                 checkpoint_name = f'cp_epoch{epoch + 1}_train_loss{train_loss:.4f}_val_loss{val_loss:.4f}.pth'
                 self.save_checkpoint(path=self.checkpoint_path, name=checkpoint_name, epoch=epoch+1, train_loss=train_loss)
-                self.keep_top_k_checkpoints(n=3)
+                self.keep_top_k_checkpoints(k=self.k)
             else:
                 count += 1
                 assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
@@ -157,21 +171,26 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         
         checkpoint_path = os.path.join(path, name)
         torch.save(checkpoint, checkpoint_path)
-        self.best_epochs.appendleft([checkpoint_path])
+        self.best_models.appendleft(checkpoint_path)
         print(f"Checkpoint saved at {checkpoint_path}")
-        
-    def keep_top_k_checkpoints(self, n: int) -> None:
-        if len(self.best_epochs) > n:
-            rm_checkpoint = self.best_epochs.pop()
-            os.remove(rm_checkpoint[1])
-            print(f"checkpoint removed : {rm_checkpoint[1]}")
+    
+    def save_exp_settings(self, info: dict[str, str], checkpoint_path: str):
+        with open(os.path.join(checkpoint_path, 'exp_settings'), 'w') as f:
+            for arg, value in info.items():
+                f.write(f"{arg} : {value}\n")
+    
+    def keep_top_k_checkpoints(self, k: int) -> None:
+        if len(self.best_models) > k:
+            rm_checkpoint = self.best_models.pop()
+            os.remove(rm_checkpoint)
+            print(f"checkpoint removed : {rm_checkpoint}")
     
     def load_settings(self) -> None:
         ## 학습 재개를 위한 모델, 옵티마이저, 스케줄러 가중치 및 설정을 불러옵니다.
         print("loading prev training setttings")
         try:
             setting_info = torch.load(
-                self.weights_path,
+                self.resume_model_path,
                 map_location='cpu'
             )
             self.start_epoch = setting_info['epoch']
@@ -190,16 +209,26 @@ def collate_fn(batch):
 if __name__=='__main__':
     ## device와 seed 설정
     from util.augmentation import TransformSelector
-    from util.data import CustomDataset
+    from util.data import CustomDataset, get_kfold_json
     import torchvision
     from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
     device = torch.device('cuda')
 
-    train_annotation = 'dataset/5-fold_json/train_fold_1.json'
-    val_annotation = 'dataset/5-fold_json/val_fold_1.json'
+    k = 2
+    num_models_to_save = 2
+    kfold_annotations = get_kfold_json(k=k)
+    print(kfold_annotations, sep="\n")
+
+    train_annotation = 'dataset/2-fold_json/train_fold_1.json'
+    val_annotation = 'dataset/2-fold_json/val_fold_1.json'
     
     data_root = './dataset'
+
+    model_name = 'fasterrcnn_resnet50_fpn'
+    optimizer_name = 'SGD(lr=0.005, momentum=0.9, weight_decay=0.0005)'
+    loss_name = 'None'
+    scheduler_name = 'None'
 
     transform_type = 'albumentations'
     height = 1024
@@ -207,10 +236,35 @@ if __name__=='__main__':
     
     num_classes = 1 + 10
     
+    lr = 0.005
     batch_size = 16
     epochs = 10
     
+    earlystop = 5
+    
     result_path = './checkpoints'
+    
+    resume = True
+    resume_model_path = './checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth'
+    
+    log_info = {'kfold' : k,
+                'train_json' : train_annotation,
+                'val_json' : val_annotation,
+                'data_root' : data_root,
+                'model' : model_name,
+                'optimizer' : optimizer_name,
+                'loss' : loss_name,
+                'scheduler' : scheduler_name, 
+                'transform_type' : transform_type,
+                'img_size' : (width, height),
+                'num_classes' : num_classes,
+                'batch_size' : batch_size,
+                'epochs' : epochs,
+                'checkpoint_path' : result_path,
+                'resume' : resume,
+                'resume_model_path' : resume_model_path,
+                }
+    
     ## 데이터 증강 및 세팅
     transform_selector = TransformSelector(transform_type=transform_type)
     
@@ -249,7 +303,7 @@ if __name__=='__main__':
     
     ## Optimizer 
     # optimizer = get_optimizer(model, optimizer_type, lr)
-    optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
+    optimizer = torch.optim.SGD(params, lr=lr, momentum=0.9, weight_decay=0.0005)
 
     ## Loss
     loss = None
@@ -270,6 +324,12 @@ if __name__=='__main__':
         loss_fn=loss,
         epochs=epochs,
         result_path=result_path,
+        topk=num_models_to_save,
+        earlystop=earlystop,
+        resume=resume,
+        resume_model_path=resume_model_path,
+        log_info=log_info
     )
 
     trainer.train()
+    
