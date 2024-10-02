@@ -1,7 +1,8 @@
 /checkpoints
 /wandb
 /data
-baseline_code.ipynb
+/baseline
+/dataset
 *.csv
 
 # Byte-compiled / optimized / DLL files
