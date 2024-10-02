@@ -66,7 +66,7 @@ def show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES)
     st.plotly_chart(fig_bbox, use_container_width=True)
 
     bbox_df["aspect_ratio"] = (bbox_df["x_max"]-bbox_df["x_min"])/(bbox_df["y_max"]-bbox_df["y_min"])
-    fig_ratio = px.bar(x=CLASSES, y=bbox_df.groupby("class_id").mean()["aspect_ratio"], 
+    fig_ratio = px.bar(x=CLASSES, y=bbox_df.groupby("class_id")["aspect_ratio"].mean(), 
                 color=CLASSES, opacity=0.85,
                 color_discrete_sequence=LABEL_COLORS_WOUT_NO_FINDING, 
                 labels={"x":"Class Name", "y":"Aspect Ratio (W/H)"},
