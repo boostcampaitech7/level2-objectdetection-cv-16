@@ -85,18 +85,20 @@ class CustomDataset(Dataset):
     def __len__(self) -> int:
         return len(self.image_id)
     
+
+    
 def get_kfold_json(
     k:int = 5, 
     data_path: str = './dataset',
     annotation_file: str='./dataset/train.json',
-    random_state: int=2024,
+    random_seed: int=2024,
     force_create: bool=False
     ) -> tuple[tuple[str, str]]:
     
     folder_path = os.path.join(data_path, f'{k}-fold_json')
     
     if not(os.path.isdir(folder_path)) or force_create:
-        return tuple(kfold_split_json(k, data_path, annotation_file, random_state))
+        return tuple(kfold_split_json(k, data_path, annotation_file, random_seed))
     else:
         json_paths = os.listdir(folder_path)
         train_kfold_paths = sorted(os.path.join(folder_path, path) for path in json_paths if 'train' in path)

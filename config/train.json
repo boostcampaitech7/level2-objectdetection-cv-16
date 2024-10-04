@@ -1,9 +1,14 @@
 {
-    "kfold_k" : 2,
-
     "device" : "cuda",
     "random_seed" : 2024,
 
+    "kfold" : {
+        "k" : 2,
+        "data_path" : "./dataset",
+        "annotation_file" : "./dataset/train.json",
+        "force_create" : false
+    },
+    
     "data" : {
         "train_json" : "dataset/2-fold_json/train_fold_1.json",
         "val_json" : "dataset/2-fold_json/val_fold_1.json",
@@ -24,16 +29,18 @@
     },
 
     "model" : {
-        "name" : "resnet",
+        "name" : "fasterrcnn_resnet50_fpn",
         "pretrained" : true
     },
     
     "trainer" : {
         "epochs" : 10,
         "num_models_to_save" : 2,
-        "checkpoint_path" : "./checkpoints",
+        "earlystop" : 2,
+        "result_path" : "./checkpoints",
         "resume" : false,
-        "resume_model_path" : "./checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth"
+        "resume_model_path" : "./checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth",
+        "verbose" : false
     },
 
     "optimizer": {
@@ -48,7 +55,8 @@
     "scheduler" : {
         "name" : "step_LR",
         "kwargs" : {
-            "step_size" : 10
+            "step_size" : 2,
+            "gamma" : 0.1
         }
     },
 

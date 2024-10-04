@@ -14,6 +14,8 @@ from torch.utils.data import DataLoader
 
 from collections import deque
 
+import shutil
+
 class Trainer: # 변수 넣으면 바로 학습되도록
     def __init__( # 여긴 config로 나중에 빼야하는지 이걸 유지하는지
         self, 
@@ -26,11 +28,12 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         loss_fn: torch.nn.modules.loss._Loss, 
         epochs: int,
         result_path: str,
-        topk: int,
+        num_models_to_save: int,
         earlystop: int, 
         resume: bool,
         resume_model_path: str,
-        log_info: dict[str, str],
+        config_json_path: dict[str, str],
+        verbose: bool
     ):
         # 클래스 초기화: 모델, 디바이스, 데이터 로더 등 설정
         self.model = model  # 훈련할 모델
@@ -43,7 +46,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         self.epochs = epochs  # 총 훈련 에폭 수
         self.result_path = result_path  # 모델 저장 경로
         
-        self.k = topk
+        self.k = num_models_to_save
         
         self.resume = resume
         self.resume_model_path = resume_model_path
@@ -54,14 +57,14 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         
         self.earlystop = earlystop
         
-        self.verbose = False
+        self.verbose = verbose
         
         now = datetime.now()
         self.time = now.strftime('%Y-%m-%d_%H.%M.%S')
         self.checkpoint_path = os.path.join(self.result_path, self.time)
         os.makedirs(self.checkpoint_path, exist_ok=True)
         
-        self.save_exp_settings(log_info, self.checkpoint_path)
+        self.save_exp_settings(config_json_path, self.checkpoint_path)
             
     def train_epoch(self, train_loader: DataLoader) -> float:
         # 한 에폭 동안의 훈련을 진행
@@ -144,6 +147,11 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             else:
                 count += 1
                 assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
+            
+            if type(self.scheduler) == optim.lr_scheduler.ReduceLROnPlateau:
+                self.scheduler.step(val_loss)
+            elif self.scheduler:
+                self.scheduler.step()
                 
         ## 최종 checkpoint 저장 코드
     
@@ -173,11 +181,12 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         torch.save(checkpoint, checkpoint_path)
         self.best_models.appendleft(checkpoint_path)
         print(f"Checkpoint saved at {checkpoint_path}")
-    
-    def save_exp_settings(self, info: dict[str, str], checkpoint_path: str):
-        with open(os.path.join(checkpoint_path, 'exp_settings'), 'w') as f:
-            for arg, value in info.items():
-                f.write(f"{arg} : {value}\n")
+                
+    def save_exp_settings(self, src: str, dst: str):
+        try:
+            shutil.copy(src, os.path.join(dst, "config.json"))
+        except:
+            raise Exception(f"could not copy {src} into {dst}")
     
     def keep_top_k_checkpoints(self, k: int) -> None:
         if len(self.best_models) > k:
@@ -206,13 +215,6 @@ class Trainer: # 변수 넣으면 바로 학습되도록
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-def asd(asd):
-    
-    print(asd)
-    print(type(asd))
-    
-    print("Hello")
-
 if __name__=='__main__':
     ## device와 seed 설정
     from util.augmentation import TransformSelector
@@ -221,61 +223,19 @@ if __name__=='__main__':
     from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
     from util.optimizers import get_optimizer
-    from args import Custom_json_parser
+    from util.schedulers import get_scheduler
+    from config.custom_json_parser import Custom_json_parser
+    
+    config_json_path = "config/train.json"
 
-    config_parser = Custom_json_parser(mode="train", config_json_path="config/train.json")
+    config_parser = Custom_json_parser(mode="train", config_json_path=config_json_path)
     config = config_parser.get_config_from_json()
     
     device = torch.device(config['device'])
     
-    k = 2
-    num_models_to_save = 2
-    kfold_annotations = get_kfold_json(k=k)
-    print(kfold_annotations, sep="\n")
-
-    train_annotation = 'dataset/2-fold_json/train_fold_1.json'
-    val_annotation = 'dataset/2-fold_json/val_fold_1.json'
+    kfold_annotations = get_kfold_json(random_seed=config['random_seed'], **config['kfold'])
     
-    data_root = './dataset'
-    
-    model_name = 'fasterrcnn_resnet50_fpn'
-    optimizer_name = config['optimizer']['name'] # SGD(lr=0.005, momentum=0.9, weight_decay=0.0005)
-    loss_name = 'None'
-    scheduler_name = 'None'
-
-    transform_type = 'albumentations'
     img_size = config['data']['img_size']
-    
-    num_classes = 1 + 10
-    
-    lr = 0.005
-    batch_size = 16
-    epochs = 10
-    
-    earlystop = 5
-    
-    result_path = './checkpoints'
-    
-    resume = True
-    resume_model_path = './checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth'
-    
-    log_info = {'kfold' : k,
-                'train_json' : train_annotation,
-                'val_json' : val_annotation,
-                'data_root' : data_root,
-                'model' : model_name,
-                'optimizer' : optimizer_name,
-                'loss' : loss_name,
-                'scheduler' : scheduler_name, 
-                'transform_type' : transform_type,
-                'img_size' : img_size,
-                'num_classes' : num_classes,
-                'batch_size' : batch_size,
-                'epochs' : epochs,
-                'checkpoint_path' : result_path,
-                'resume' : resume,
-                'resume_model_path' : resume_model_path,
-                }
     
     ## 데이터 증강 및 세팅
     transform_selector = TransformSelector(transform_type=config['augmentation']['name'])
@@ -290,7 +250,7 @@ if __name__=='__main__':
     
     train_dataloader = DataLoader(
         train_dataset,
-        batch_size=batch_size,
+        batch_size=config['data']['batch_size'],
         shuffle=False,
         num_workers=0,
         collate_fn=collate_fn
@@ -298,7 +258,7 @@ if __name__=='__main__':
     
     val_dataloader = DataLoader(
         val_dataset,
-        batch_size=batch_size,
+        batch_size=config['data']['batch_size'],
         shuffle=False,
         num_workers=0,
         collate_fn=collate_fn
@@ -307,21 +267,19 @@ if __name__=='__main__':
     ## 학습 모델
     
     # model = model_selector.get_model()
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=config['model']['pretrained'])
     in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, config['data']['num_classes']+1)
     model.to(device)
-    params = [p for p in model.parameters() if p.requires_grad]
     
     ## Optimizer 
     optimizer = get_optimizer(config['optimizer']['name'], model, config['optimizer']['kwargs'])
 
-    raise
     ## Loss
     loss = None
     
     ## Scheduler
-    scheduler = None
+    scheduler = get_scheduler(config['scheduler']['name'], optimizer, config['scheduler']['kwargs'], dataset_len=len(train_dataloader))
     
     model.to(device)    
 
@@ -334,13 +292,8 @@ if __name__=='__main__':
         optimizer=optimizer,
         scheduler=scheduler,
         loss_fn=loss,
-        epochs=epochs,
-        result_path=result_path,
-        topk=num_models_to_save,
-        earlystop=earlystop,
-        resume=resume,
-        resume_model_path=resume_model_path,
-        log_info=log_info
+        config_json_path=config_json_path,
+        **config['trainer']
     )
 
     trainer.train()
