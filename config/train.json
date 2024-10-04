@@ -1,0 +1,59 @@
+{
+    "kfold_k" : 2,
+
+    "device" : "cuda",
+    "random_seed" : 2024,
+
+    "data" : {
+        "train_json" : "dataset/2-fold_json/train_fold_1.json",
+        "val_json" : "dataset/2-fold_json/val_fold_1.json",
+        "data_root" : "./dataset",
+        "batch_size" : 16,
+        "img_size" : [1024, 1024],
+        "num_classes" : 10
+    }, 
+
+    "augmentation" : {
+        "name" : "albumentations",
+        "train_transform" : {
+
+        },
+        "val_transform" : {
+
+        }
+    },
+
+    "model" : {
+        "name" : "resnet",
+        "pretrained" : true
+    },
+    
+    "trainer" : {
+        "epochs" : 10,
+        "num_models_to_save" : 2,
+        "checkpoint_path" : "./checkpoints",
+        "resume" : false,
+        "resume_model_path" : "./checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth"
+    },
+
+    "optimizer": {
+        "name" : "sgd",
+        "kwargs" : {
+            "lr" : 1e-4,
+            "momentum" : 0.5,
+            "weight_decay" : 0.0005
+        }
+    },
+
+    "scheduler" : {
+        "name" : "step_LR",
+        "kwargs" : {
+            "step_size" : 10
+        }
+    },
+
+    "loss" : {
+        "name" : "custom",
+        "kwargs": {}
+    }
+}

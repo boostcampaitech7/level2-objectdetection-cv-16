@@ -206,6 +206,13 @@ class Trainer: # 변수 넣으면 바로 학습되도록
 def collate_fn(batch):
     return tuple(zip(*batch))
 
+def asd(asd):
+    
+    print(asd)
+    print(type(asd))
+    
+    print("Hello")
+
 if __name__=='__main__':
     ## device와 seed 설정
     from util.augmentation import TransformSelector
@@ -213,8 +220,14 @@ if __name__=='__main__':
     import torchvision
     from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
-    device = torch.device('cuda')
+    from util.optimizers import get_optimizer
+    from args import Custom_json_parser
 
+    config_parser = Custom_json_parser(mode="train", config_json_path="config/train.json")
+    config = config_parser.get_config_from_json()
+    
+    device = torch.device(config['device'])
+    
     k = 2
     num_models_to_save = 2
     kfold_annotations = get_kfold_json(k=k)
@@ -224,15 +237,14 @@ if __name__=='__main__':
     val_annotation = 'dataset/2-fold_json/val_fold_1.json'
     
     data_root = './dataset'
-
+    
     model_name = 'fasterrcnn_resnet50_fpn'
-    optimizer_name = 'SGD(lr=0.005, momentum=0.9, weight_decay=0.0005)'
+    optimizer_name = config['optimizer']['name'] # SGD(lr=0.005, momentum=0.9, weight_decay=0.0005)
     loss_name = 'None'
     scheduler_name = 'None'
 
     transform_type = 'albumentations'
-    height = 1024
-    width = 1024
+    img_size = config['data']['img_size']
     
     num_classes = 1 + 10
     
@@ -256,7 +268,7 @@ if __name__=='__main__':
                 'loss' : loss_name,
                 'scheduler' : scheduler_name, 
                 'transform_type' : transform_type,
-                'img_size' : (width, height),
+                'img_size' : img_size,
                 'num_classes' : num_classes,
                 'batch_size' : batch_size,
                 'epochs' : epochs,
@@ -266,15 +278,15 @@ if __name__=='__main__':
                 }
     
     ## 데이터 증강 및 세팅
-    transform_selector = TransformSelector(transform_type=transform_type)
+    transform_selector = TransformSelector(transform_type=config['augmentation']['name'])
     
     train_transform = transform_selector.get_transform(augment=True, 
-                                                       height=height, width=width)
+                                                       width=img_size[0], height=img_size[1])
     val_transform = transform_selector.get_transform(augment=False, 
-                                                     height=height, width=width)
+                                                     width=img_size[0], height=img_size[1])
 
-    train_dataset = CustomDataset(train_annotation, data_root, transforms=train_transform)
-    val_dataset = CustomDataset(val_annotation, data_root, transforms=val_transform)
+    train_dataset = CustomDataset(config['data']['train_json'], config['data']['data_root'], transforms=train_transform)
+    val_dataset = CustomDataset(config['data']['val_json'], config['data']['data_root'], transforms=val_transform)
     
     train_dataloader = DataLoader(
         train_dataset,
@@ -302,9 +314,9 @@ if __name__=='__main__':
     params = [p for p in model.parameters() if p.requires_grad]
     
     ## Optimizer 
-    # optimizer = get_optimizer(model, optimizer_type, lr)
-    optimizer = torch.optim.SGD(params, lr=lr, momentum=0.9, weight_decay=0.0005)
+    optimizer = get_optimizer(config['optimizer']['name'], model, config['optimizer']['kwargs'])
 
+    raise
     ## Loss
     loss = None
     

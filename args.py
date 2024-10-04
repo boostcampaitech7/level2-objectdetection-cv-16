@@ -1,6 +1,9 @@
 import argparse
 from argparse import Namespace
 from argparse import ArgumentParser
+
+import json
+
 class Custom_arguments_parser:
     def __init__(self, mode: str):
         self.mode = mode
@@ -74,6 +77,21 @@ class Custom_arguments_parser:
         
         return parser.parse_args()
 
+
+class Custom_json_parser:
+    def __init__(self, mode, config_json_path):
+        self.config_json_path = config_json_path
+        
+        with open(self.config_json_path) as f:
+            self.config = json.load(f)
+    
+    def get_config_from_json(self):
+        return self.config
+        
+    def get_config_parameters(self):
+        return self.config.keys()
+        
+
 # if __name__=='__main__':
     
 #     asd = arguments_parser(mode='train')
@@ -81,3 +99,4 @@ class Custom_arguments_parser:
 #     a = asd.parse_base_args()
     
 #     print(a)
+

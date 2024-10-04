@@ -15,3 +15,7 @@ class CustomLoss(nn.Module):
     ) -> torch.Tensor:
     
         return self.loss_fn(outputs, targets)
+    
+    
+def get_loss():
+    pass
