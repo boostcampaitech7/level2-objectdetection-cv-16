@@ -1,0 +1,6 @@
+{
+    "train_config_json" : "",
+    "data_path" :  "",
+    "test_json" : "",
+    "checkpoint_path" : ""
+}

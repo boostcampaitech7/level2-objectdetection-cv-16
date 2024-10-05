@@ -120,7 +120,7 @@ class TransformSelector: #사용자가 지정한 transform_type에 따라 서로
 
     def get_transform(
             self, 
-            augment: bool, 
+            augment: bool,
             kwargs: dict,
             alpha: float=1.0,
         ) -> Union[BasicTransforms, AlbumentationsTransforms, CutMixTransforms, MixUpTransforms]:

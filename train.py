@@ -1,7 +1,6 @@
 import os
 from argparse import Namespace
 
-from args import Custom_arguments_parser
 import random
 import wandb
 import torch
@@ -18,48 +17,51 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from model import model_selection
-
-from util.data import CustomDataset, HoDataLoad   # hobbang: Dataset, DataLoader 코드 하나로 합체
+from util.data import CustomDataset, get_kfold_json
 from util.augmentation import TransformSelector
 from util.optimizers import get_optimizer
 from util.losses import CustomLoss
 from util.schedulers import get_scheduler
 from trainer import Trainer
 
+from config.custom_json_parser import Custom_json_parser
+
 from model.model_selection import ModelSelector
 
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-def run_train(args:Namespace) -> None:
-    ## device와 seed 설정
-    device = torch.device('cuda')
-
-    annotation = './dataset/train.json'
-    data_root = './dataset'
-
-    transform_type = 'albumentations'
-    height = 1024
-    width = 1024
+def run_train(config_json_path, config: dict) -> None:
     
-    num_classes = 1 + 10
+    device = torch.device(config['device'])
     
-    batch_size = 16
-    epochs = 10
+    kfold_annotations = get_kfold_json(random_seed=config['random_seed'], **config['kfold'])
     
-    result_path = './temp'
+    img_size = config['data']['img_size']
+    
     ## 데이터 증강 및 세팅
-    transform_selector = TransformSelector(transform_type=transform_type)
+    transform_selector = TransformSelector(transform_type=config['augmentation']['name'],
+                                           common_transform=config['augmentation']['common_transform'])
     
+    train_transform = transform_selector.get_transform(augment=True,
+                                                       kwargs=config['augmentation']['train_transform'])
+    val_transform = transform_selector.get_transform(augment=False, 
+                                                     kwargs=config['augmentation']['val_transform'])
+
+    train_dataset = CustomDataset(config['data']['train_json'], config['data']['data_root'], transforms=train_transform)
+    val_dataset = CustomDataset(config['data']['val_json'], config['data']['data_root'], transforms=val_transform)
     
-    train_transform = transform_selector.get_transform(augment=True, height=height, width=width)
-
-    train_dataset = CustomDataset(annotation, data_root, transforms=train_transform)
-
     train_dataloader = DataLoader(
         train_dataset,
-        batch_size=batch_size,
+        batch_size=config['data']['batch_size'],
+        shuffle=False,
+        num_workers=0,
+        collate_fn=collate_fn
+    )
+    
+    val_dataloader = DataLoader(
+        val_dataset,
+        batch_size=config['data']['batch_size'],
         shuffle=False,
         num_workers=0,
         collate_fn=collate_fn
@@ -68,21 +70,19 @@ def run_train(args:Namespace) -> None:
     ## 학습 모델
     
     # model = model_selector.get_model()
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=config['model']['pretrained'])
     in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, config['data']['num_classes']+1)
     model.to(device)
-    params = [p for p in model.parameters() if p.requires_grad]
     
     ## Optimizer 
-    # optimizer = get_optimizer(model, optimizer_type, lr)
-    optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
+    optimizer = get_optimizer(config['optimizer']['name'], model, config['optimizer']['kwargs'])
 
     ## Loss
     loss = None
     
     ## Scheduler
-    scheduler = None
+    scheduler = get_scheduler(config['scheduler']['name'], optimizer, config['scheduler']['kwargs'])
     
     model.to(device)    
 
@@ -91,31 +91,37 @@ def run_train(args:Namespace) -> None:
         model=model,
         device=device,
         train_loader=train_dataloader,
-        val_loader=None,
+        val_loader=val_dataloader,
         optimizer=optimizer,
         scheduler=scheduler,
         loss_fn=loss,
-        epochs=epochs,
-        result_path=result_path,
+        config_json_path=config_json_path,
+        **config['trainer']
     )
 
     trainer.train()
 
 if __name__=='__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-cjp', '--config_json_path', type=str, required=True, help="include the config.json file for training", action="store")
+    
+    ## 입력 받은 경로의 config.json 경로 가져오기
+    config_json_path = parser.parse_args().config_json_path
     
     ## 설정 및 하이퍼파라미터 가져오기
-    train_parser = Custom_arguments_parser(mode='train')
-    args = train_parser.get_parser()
+    config_parser = Custom_json_parser(mode="train", config_json_path=config_json_path)
+    config = config_parser.get_config_from_json()
     
     # cuda 적용
-    if args.device.lower() == 'cuda':
+    if config['device'].lower() == 'cuda':
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        assert device == 'cuda', 'cuda로 수행하려고 하였으나 cuda를 찾을 수 없습니다.'
+        if device=='cpu': print("cuda를 찾을 수 없어 cpu로 학습을 진행합니다")
     else:
         device = 'cpu'
 
     # seed값 설정
-    seed = args.seed
+    seed = config['random_seed']
     deterministic = True
 
     random.seed(seed) # random seed 고정
@@ -127,6 +133,6 @@ if __name__=='__main__':
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-    run_train(args)
+    run_train(config_json_path, config)
     
     

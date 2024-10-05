@@ -1,1 +1,1 @@
-python -u train.py
+python -u train.py -cjp config/train.json
