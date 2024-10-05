@@ -245,9 +245,10 @@ if __name__=='__main__':
     img_size = config['data']['img_size']
     
     ## 데이터 증강 및 세팅
-    transform_selector = TransformSelector(transform_type=config['augmentation']['name'])
+    transform_selector = TransformSelector(transform_type=config['augmentation']['name'],
+                                           common_transform=config['augmentation']['common_transform'])
     
-    train_transform = transform_selector.get_transform(augment=True, 
+    train_transform = transform_selector.get_transform(augment=True,
                                                        kwargs=config['augmentation']['train_transform'])
     val_transform = transform_selector.get_transform(augment=False, 
                                                      kwargs=config['augmentation']['val_transform'])

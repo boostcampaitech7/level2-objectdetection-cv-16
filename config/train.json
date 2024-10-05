@@ -21,10 +21,21 @@
     "augmentation" : {
         "name" : "albumentations",
         "train_transform" : {
-
+            "hflip" : {
+                "p" : 0.5 
+            },
+            "rotation" : {
+                "limit" : [-60, 60],
+                "border_mode" : 0,
+                "value" : [255, 255, 255],
+                "p" : 0.5
+            }
         },
-        "val_transform" : {
-
+        "common_transform" : {
+            "resize" : {
+                "height" : 1024,
+                "width" : 1024
+            }
         }
     },
 
@@ -53,7 +64,7 @@
     },
 
     "scheduler" : {
-        "name" : "step_LR",
+        "name" : "stepLR",
         "kwargs" : {
             "step_size" : 2,
             "gamma" : 0.1

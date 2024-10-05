@@ -38,23 +38,23 @@ class BasicTransforms:
 
 # Albumentation 기반 트랜스폼
 class AlbumentationsTransforms:
-    def __init__(self, augment=False, height: int=1024, width: int=1024) -> None: #True면 증강을 포함한 트랜스폼 적용, False면 기본 트랜스폼 적용
+    def __init__(self, augment: bool=False, common_transform: dict={}, kwargs: dict={}) -> None: #True면 증강을 포함한 트랜스폼 적용, False면 기본 트랜스폼 적용
+        options = {"resize" : A.Resize,
+                   "normalize" : A.Normalize,
+                   "rotation" : A.Rotate,
+                   "hflip" : A.HorizontalFlip,
+                   "vflip" : A.VerticalFlip}
         self.augment = augment
-        self.height = height
-        self.width = width
+        selected_options = []
+        for k, v in kwargs.items():
+            selected_options.append(options[k](**v))
 
-        common_transform = [
-            A.Resize(self.height, self.width),
-            ToTensorV2()
-        ]
-
+        common_transform = [options[k](**v) for k, v in common_transform.items()] + [ToTensorV2()]
         # 증강 없는 기본 트랜스폼
         self.base_transform = A.Compose(common_transform, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
 
-        aug_list = []
-        
         # Albumentations 증강을 사용한 트랜스폼 (랜덤 자르기, 플립, 회전...)
-        self.augment_transform = A.Compose(aug_list + common_transform, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
+        self.augment_transform = A.Compose(selected_options + common_transform, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
 
     def __call__(self, **kwargs) -> torch.Tensor: #이미지에 트랜스폼 적용
         if self.augment:
@@ -112,27 +112,27 @@ class MixUpTransforms:
 
 # 트랜스폼 데이터 증강 라이브러리와 기법을 선택하는 클래스
 class TransformSelector: #사용자가 지정한 transform_type에 따라 서로 다른 변환 객체를 반환하는 구조
-    def __init__(self, transform_type: str) -> None:
+    def __init__(self, transform_type: str, common_transform: dict[str, Union[str, bool, int, float]]) -> None:
         # 입력받은 transform_type을 소문자로 변환하여 저장
         self.transform_type = transform_type.lower()
+        self.common_transform = common_transform
         # 인자 확인해서 변환 라이브러리를 선택함
 
     def get_transform(
             self, 
-            augment: bool=False, 
+            augment: bool, 
+            kwargs: dict,
             alpha: float=1.0,
-            height: int=224,
-            width: int=224,
         ) -> Union[BasicTransforms, AlbumentationsTransforms, CutMixTransforms, MixUpTransforms]:
         """
         augment: 데이터 증강 여부
         alpha: MixUp이나 CutMix의 파라미터
         """
         if self.transform_type == 'basic':
-            return BasicTransforms(augment=augment, height=height, width=width)
+            return BasicTransforms(augment=augment)
 
         elif self.transform_type == 'albumentations':
-            return AlbumentationsTransforms(augment=augment, height=height, width=width)
+            return AlbumentationsTransforms(augment, self.common_transform, kwargs)
         
         elif self.transform_type == 'cutmix':
             return CutMixTransforms(alpha=alpha)

@@ -4,7 +4,7 @@ def get_scheduler(
     lr_scheduler: str, 
     optimizer: optim.Optimizer, 
     kwargs: dict
-    ) -> optim.lr_scheduler.LRScheduler:
+    ) -> optim.lr_scheduler._LRScheduler:
     
     if lr_scheduler == 'stepLR':
         scheduler = optim.lr_scheduler.StepLR(
