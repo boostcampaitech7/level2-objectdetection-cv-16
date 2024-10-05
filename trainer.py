@@ -48,6 +48,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
         
         self.k = num_models_to_save
         
+        self.start_epoch = 0
         self.resume = resume
         self.resume_model_path = resume_model_path
         
@@ -87,7 +88,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             losses.backward()
             self.optimizer.step()
             
-            train_loss += loss_value * train_loader.batch_size
+            train_loss += loss_value * len(images)
             progress_bar.set_postfix(loss=loss_value)
         
         train_loss = train_loss / train_loader.dataset.__len__()
@@ -117,7 +118,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
                 losses = sum(loss for loss in loss_dict.values())
                 loss_value = losses.item()
                 
-                val_loss += loss_value * val_loader.batch_size
+                val_loss += loss_value * len(images)
                 progress_bar.set_postfix(loss=loss_value)
 
         val_loss = val_loss / val_loader.dataset.__len__()
@@ -136,6 +137,9 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             
             print(f"Epoch {epoch+1}, Train Loss : {train_loss:.8f}, val_loss : {val_loss:.8f}")
             
+            if train_loss < self.best_train_loss:
+                self.best_train_loss = train_loss
+            
             if val_loss < self.best_val_loss:
                 print(f"best validation loss updated")
                 count = 0
@@ -146,14 +150,17 @@ class Trainer: # 변수 넣으면 바로 학습되도록
                 self.keep_top_k_checkpoints(k=self.k)
             else:
                 count += 1
-                assert count != self.earlystop, "EarlyStop - 더이상 개선이 없어 학습이 중단됩니다"
+                print("EarlyStop : 더이상 개선이 없어 학습이 중단됩니다")
+                break 
             
             if type(self.scheduler) == optim.lr_scheduler.ReduceLROnPlateau:
                 self.scheduler.step(val_loss)
             elif self.scheduler:
                 self.scheduler.step()
-                
-        ## 최종 checkpoint 저장 코드
+        
+        print(f"training for {self.epochs} epochs finished")
+        print(f"best train loss : {self.best_train_loss:.5f}, best val loss : {self.best_val_loss:.5f}")
+        print(f"last train loss : {train_loss}, last val loss : {val_loss}")
     
     def save_checkpoint(self, path: str, name: str, epoch: int, train_loss: float) -> None:
         '''
@@ -241,9 +248,9 @@ if __name__=='__main__':
     transform_selector = TransformSelector(transform_type=config['augmentation']['name'])
     
     train_transform = transform_selector.get_transform(augment=True, 
-                                                       width=img_size[0], height=img_size[1])
+                                                       kwargs=config['augmentation']['train_transform'])
     val_transform = transform_selector.get_transform(augment=False, 
-                                                     width=img_size[0], height=img_size[1])
+                                                     kwargs=config['augmentation']['val_transform'])
 
     train_dataset = CustomDataset(config['data']['train_json'], config['data']['data_root'], transforms=train_transform)
     val_dataset = CustomDataset(config['data']['val_json'], config['data']['data_root'], transforms=val_transform)
@@ -279,7 +286,7 @@ if __name__=='__main__':
     loss = None
     
     ## Scheduler
-    scheduler = get_scheduler(config['scheduler']['name'], optimizer, config['scheduler']['kwargs'], dataset_len=len(train_dataloader))
+    scheduler = get_scheduler(config['scheduler']['name'], optimizer, config['scheduler']['kwargs'])
     
     model.to(device)    
 
