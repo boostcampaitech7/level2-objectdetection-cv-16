@@ -1,1 +1,1 @@
-python -u train.py -cjp config/train.json
+CUBLAS_WORKSPACE_CONFIG=:16:8 python -u train.py -cjp config/train_config.json

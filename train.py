@@ -31,6 +31,12 @@ from model.model_selection import ModelSelector
 def collate_fn(batch):
     return tuple(zip(*batch))
 
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+    
+
 def run_train(config_json_path, config: dict) -> None:
     
     device = torch.device(config['device'])
@@ -51,11 +57,16 @@ def run_train(config_json_path, config: dict) -> None:
     train_dataset = CustomDataset(config['data']['train_json'], config['data']['data_root'], transforms=train_transform)
     val_dataset = CustomDataset(config['data']['val_json'], config['data']['data_root'], transforms=val_transform)
     
+    g = torch.Generator()
+    g.manual_seed(config['random_seed'])
+    
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=config['data']['batch_size'],
         shuffle=False,
         num_workers=0,
+        worker_init_fn=seed_worker,
+        generator=g,
         collate_fn=collate_fn
     )
     
@@ -64,6 +75,8 @@ def run_train(config_json_path, config: dict) -> None:
         batch_size=config['data']['batch_size'],
         shuffle=False,
         num_workers=0,
+        worker_init_fn=seed_worker,
+        generator=g,
         collate_fn=collate_fn
     )
     
@@ -84,7 +97,7 @@ def run_train(config_json_path, config: dict) -> None:
     ## Scheduler
     scheduler = get_scheduler(config['scheduler']['name'], optimizer, config['scheduler']['kwargs'])
     
-    model.to(device)    
+    model.to(device)
 
     ## 학습 시작
     trainer = Trainer(
@@ -127,7 +140,9 @@ if __name__=='__main__':
     random.seed(seed) # random seed 고정
     np.random.seed(seed) # numpy random seed 고정
     torch.manual_seed(seed) # torch random seed 고정
+    torch.use_deterministic_algorithms(True)
     if device == 'cuda':
+        torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
     if deterministic:
         torch.backends.cudnn.deterministic = True
