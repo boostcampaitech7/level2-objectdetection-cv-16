@@ -1,0 +1,1 @@
+python -u test.py -cjp config/test_config.json

@@ -1,6 +1,26 @@
 {
-    "train_config_json" : "",
-    "data_path" :  "",
-    "test_json" : "",
-    "checkpoint_path" : ""
+    "device" : "cuda",
+
+    "data" : {
+        "dataset" : {
+            "annotation" : "./dataset/test.json",
+            "data_dir" : "./dataset",
+            "is_train" : false
+        },
+        "dataloader" : {
+            "batch_size" : 8,
+            "shuffle" : false,
+            "num_workers" : 4
+        }
+    },
+    
+    "checkpoint" : {
+        "train_config_json" : "checkpoints/2024-10-05_21.23.08/config.json",
+        "path" : "checkpoints/2024-10-05_21.23.08/cp_epoch2_train_loss1.2627_val_loss1.0027.pth"
+    },
+
+    "result" : {
+        "score_threshold" : 0.05,
+        "output_path" : "checkpoints/2024-10-05_21.23.08/faster_rcnn_torchvision_submission.csv"
+    }
 }
