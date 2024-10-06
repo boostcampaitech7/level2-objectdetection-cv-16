@@ -53,7 +53,7 @@
         "result_path" : "./checkpoints",
         "resume" : false,
         "resume_model_path" : "./checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth",
-        "verbose" : true
+        "verbose" : false
     },
 
     "optimizer": {
