@@ -68,7 +68,7 @@ def main(test_config: dict, train_config: dict):
     submission = pd.DataFrame()
     submission['PredictionString'] = prediction_strings
     submission['image_id'] = file_names
-    submission.to_csv(test_config['result']['output_path'], index=None)
+    submission.to_csv(os.path.join(test_config['result']['output_path'], "submission.csv"), index=None)
     print(submission.head())
 
 if __name__=='__main__':

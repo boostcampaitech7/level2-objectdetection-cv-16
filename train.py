@@ -48,7 +48,6 @@ def seed_worker(worker_id):
     np.random.seed(worker_seed)
     random.seed(worker_seed)
     
-
 def run_train(config_json_path, config: dict) -> None:
     
     device = torch.device(config['device'])

@@ -21,6 +21,6 @@
 
     "result" : {
         "score_threshold" : 0.05,
-        "output_path" : "checkpoints/2024-10-05_21.23.08/faster_rcnn_torchvision_submission.csv"
+        "output_path" : "checkpoints/2024-10-05_21.23.08/"
     }
 }
