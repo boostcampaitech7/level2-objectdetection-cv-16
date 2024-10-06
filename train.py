@@ -28,6 +28,18 @@ from config.custom_json_parser import Custom_json_parser
 
 from model.model_selection import ModelSelector
 
+def seed_exp(seed: int, deterministic: bool):
+    random.seed(seed) # random seed 고정
+    np.random.seed(seed) # numpy random seed 고정
+    torch.manual_seed(seed) # torch random seed 고정
+    torch.use_deterministic_algorithms(True)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    if deterministic:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
 def collate_fn(batch):
     return tuple(zip(*batch))
 
@@ -125,29 +137,13 @@ if __name__=='__main__':
     ## 설정 및 하이퍼파라미터 가져오기
     config_parser = Custom_json_parser(mode="train", config_json_path=config_json_path)
     config = config_parser.get_config_from_json()
-    
-    # cuda 적용
-    if config['device'].lower() == 'cuda':
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        if device=='cpu': print("cuda를 찾을 수 없어 cpu로 학습을 진행합니다")
-    else:
-        device = 'cpu'
 
     # seed값 설정
     seed = config['random_seed']
     deterministic = True
 
-    random.seed(seed) # random seed 고정
-    np.random.seed(seed) # numpy random seed 고정
-    torch.manual_seed(seed) # torch random seed 고정
-    torch.use_deterministic_algorithms(True)
-    if device == 'cuda':
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-    if deterministic:
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-
+    seed_exp(seed, deterministic)
+    
     run_train(config_json_path, config)
     
     

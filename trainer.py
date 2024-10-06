@@ -89,6 +89,7 @@ class Trainer: # 변수 넣으면 바로 학습되도록
             self.optimizer.step()
             
             train_loss += loss_value * len(images)
+            print(loss_value)
             progress_bar.set_postfix(loss=loss_value)
         
         train_loss = train_loss / train_loader.dataset.__len__()
