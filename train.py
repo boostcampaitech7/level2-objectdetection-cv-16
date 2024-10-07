@@ -139,7 +139,7 @@ if __name__=='__main__':
 
     # seed값 설정
     seed = config['random_seed']
-    deterministic = True
+    deterministic = False
 
     seed_exp(seed, deterministic)
     
