@@ -47,19 +47,19 @@
     },
     
     "trainer" : {
-        "epochs" : 10,
-        "num_models_to_save" : 2,
-        "earlystop" : 2,
+        "epochs" : 100,
+        "num_models_to_save" : 1,
+        "earlystop" : 10,
         "result_path" : "./checkpoints",
         "resume" : false,
-        "resume_model_path" : "./checkpoints/2024-10-02_15.12.43/cp_epoch3_train_loss0.4749_val_loss0.5499.pth",
+        "resume_model_path" : "/data/ephemeral/home/kwak/level2-objectdetection-cv-16/checkpoints/2024-10-09_03.18.49/cp_epoch2_train_loss0.9940_val_loss0.9188.pth",
         "verbose" : false
     },
 
     "optimizer": {
         "name" : "sgd",
         "kwargs" : {
-            "lr" : 1e-4,
+            "lr" : 1e-2,
             "momentum" : 0.5,
             "weight_decay" : 0.0005
         }
@@ -68,7 +68,7 @@
     "scheduler" : {
         "name" : "stepLR",
         "kwargs" : {
-            "step_size" : 2,
+            "step_size" : 25,
             "gamma" : 0.1
         }
     },
