@@ -130,3 +130,9 @@ nohup.out
 config.txt
 
 log
+
+mmdet.tar.gz
+
+mmdet
+
+model/configs
