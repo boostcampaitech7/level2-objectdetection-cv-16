@@ -1,0 +1,872 @@
+nohup: ignoring input
+2024-10-09 11:42:26,156 - mmcv - INFO - initialize ResNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'torchvision://resnet50'}
+2024-10-09 11:42:26,157 - mmcv - INFO - load model from: torchvision://resnet50
+2024-10-09 11:42:26,157 - mmcv - INFO - load checkpoint from torchvision path: torchvision://resnet50
+2024-10-09 11:42:26,259 - mmcv - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+2024-10-09 11:42:26,274 - mmcv - INFO - initialize FPN with init_cfg {'type': 'Xavier', 'layer': 'Conv2d', 'distribution': 'uniform'}
+2024-10-09 11:42:26,299 - mmcv - INFO - initialize RPNHead with init_cfg {'type': 'Normal', 'layer': 'Conv2d', 'std': 0.01}
+2024-10-09 11:42:26,304 - mmcv - INFO - initialize Shared2FCBBoxHead with init_cfg [{'type': 'Normal', 'std': 0.01, 'override': {'name': 'fc_cls'}}, {'type': 'Normal', 'std': 0.001, 'override': {'name': 'fc_reg'}}, {'type': 'Xavier', 'distribution': 'uniform', 'override': [{'name': 'shared_fcs'}, {'name': 'cls_fcs'}, {'name': 'reg_fcs'}]}]
+2024-10-09 11:42:26,416 - mmcv - INFO - 
+backbone.conv1.weight - torch.Size([64, 3, 7, 7]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,416 - mmcv - INFO - 
+backbone.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,416 - mmcv - INFO - 
+backbone.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,416 - mmcv - INFO - 
+backbone.layer1.0.conv1.weight - torch.Size([64, 64, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,416 - mmcv - INFO - 
+backbone.layer1.0.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.downsample.0.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.downsample.1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,417 - mmcv - INFO - 
+backbone.layer1.0.downsample.1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.conv1.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.1.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.2.conv1.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,418 - mmcv - INFO - 
+backbone.layer1.2.bn1.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.bn1.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.bn2.weight - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.bn2.bias - torch.Size([64]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.conv3.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.bn3.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer1.2.bn3.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer2.0.conv1.weight - torch.Size([128, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer2.0.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,419 - mmcv - INFO - 
+backbone.layer2.0.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.conv3.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.bn3.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.bn3.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.downsample.0.weight - torch.Size([512, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.downsample.1.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.0.downsample.1.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.1.conv1.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,420 - mmcv - INFO - 
+backbone.layer2.1.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.conv3.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.bn3.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.1.bn3.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.2.conv1.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.2.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,421 - mmcv - INFO - 
+backbone.layer2.2.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.conv3.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.bn3.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.2.bn3.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.3.conv1.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.3.bn1.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.3.bn1.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,422 - mmcv - INFO - 
+backbone.layer2.3.bn2.weight - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer2.3.bn2.bias - torch.Size([128]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer2.3.conv3.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer2.3.bn3.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer2.3.bn3.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.conv1.weight - torch.Size([256, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,423 - mmcv - INFO - 
+backbone.layer3.0.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.downsample.0.weight - torch.Size([1024, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.downsample.1.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.0.downsample.1.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.1.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.1.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.1.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.1.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,424 - mmcv - INFO - 
+backbone.layer3.1.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.1.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.1.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.1.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.1.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,425 - mmcv - INFO - 
+backbone.layer3.2.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.2.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.2.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.2.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,426 - mmcv - INFO - 
+backbone.layer3.3.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.3.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.3.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,427 - mmcv - INFO - 
+backbone.layer3.4.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn1.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn1.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.conv2.weight - torch.Size([256, 256, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn2.weight - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn2.bias - torch.Size([256]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn3.weight - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer3.5.bn3.bias - torch.Size([1024]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,428 - mmcv - INFO - 
+backbone.layer4.0.conv1.weight - torch.Size([512, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn1.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn1.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.conv2.weight - torch.Size([512, 512, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn2.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn2.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn3.weight - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.bn3.bias - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.downsample.0.weight - torch.Size([2048, 1024, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.downsample.1.weight - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,429 - mmcv - INFO - 
+backbone.layer4.0.downsample.1.bias - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.conv1.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn1.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn1.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.conv2.weight - torch.Size([512, 512, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn2.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn2.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn3.weight - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.1.bn3.bias - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.2.conv1.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,430 - mmcv - INFO - 
+backbone.layer4.2.bn1.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.bn1.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.conv2.weight - torch.Size([512, 512, 3, 3]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.bn2.weight - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.bn2.bias - torch.Size([512]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.bn3.weight - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+backbone.layer4.2.bn3.bias - torch.Size([2048]): 
+PretrainedInit: load from torchvision://resnet50 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+neck.lateral_convs.0.conv.weight - torch.Size([256, 256, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+neck.lateral_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,431 - mmcv - INFO - 
+neck.lateral_convs.1.conv.weight - torch.Size([256, 512, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.lateral_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.lateral_convs.2.conv.weight - torch.Size([256, 1024, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.lateral_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.lateral_convs.3.conv.weight - torch.Size([256, 2048, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.lateral_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.0.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.1.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.2.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,432 - mmcv - INFO - 
+neck.fpn_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+neck.fpn_convs.3.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+neck.fpn_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of FasterRCNN  
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_conv.weight - torch.Size([256, 256, 3, 3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_conv.bias - torch.Size([256]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_cls.weight - torch.Size([3, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_cls.bias - torch.Size([3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_reg.weight - torch.Size([12, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+rpn_head.rpn_reg.bias - torch.Size([12]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,433 - mmcv - INFO - 
+roi_head.bbox_head.fc_cls.weight - torch.Size([11, 1024]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.fc_cls.bias - torch.Size([11]): 
+NormalInit: mean=0, std=0.01, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.fc_reg.weight - torch.Size([40, 1024]): 
+NormalInit: mean=0, std=0.001, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.fc_reg.bias - torch.Size([40]): 
+NormalInit: mean=0, std=0.001, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.shared_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.shared_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.shared_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+2024-10-09 11:42:26,434 - mmcv - INFO - 
+roi_head.bbox_head.shared_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+ 
+loading annotations into memory...
+Done (t=0.07s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.01s)
+creating index...
+index created!
+loading prev training setttings
+loading successful
+Epoch 5/100
+Epoch 5, Train Loss : 0.63142029, val_loss : 0.62012268
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch5_train_loss0.6314_val_loss0.6201.pth
+Epoch 6/100
+Epoch 6, Train Loss : 0.61344926, val_loss : 0.60105583
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch6_train_loss0.6134_val_loss0.6011.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch5_train_loss0.6314_val_loss0.6201.pth
+Epoch 7/100
+Epoch 7, Train Loss : 0.59420898, val_loss : 0.63181960
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 8/100
+Epoch 8, Train Loss : 0.58085256, val_loss : 0.58822633
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch8_train_loss0.5809_val_loss0.5882.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch6_train_loss0.6134_val_loss0.6011.pth
+Epoch 9/100
+Epoch 9, Train Loss : 0.56650030, val_loss : 0.58820803
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch9_train_loss0.5665_val_loss0.5882.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch8_train_loss0.5809_val_loss0.5882.pth
+Epoch 10/100
+Epoch 10, Train Loss : 0.55395332, val_loss : 0.58333192
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch10_train_loss0.5540_val_loss0.5833.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch9_train_loss0.5665_val_loss0.5882.pth
+Epoch 11/100
+Epoch 11, Train Loss : 0.53808893, val_loss : 0.56981636
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch11_train_loss0.5381_val_loss0.5698.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch10_train_loss0.5540_val_loss0.5833.pth
+Epoch 12/100
+Epoch 12, Train Loss : 0.52524808, val_loss : 0.57138207
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 13/100
+Epoch 13, Train Loss : 0.51523450, val_loss : 0.56313621
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch13_train_loss0.5152_val_loss0.5631.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch11_train_loss0.5381_val_loss0.5698.pth
+Epoch 14/100
+Epoch 14, Train Loss : 0.50603849, val_loss : 0.57840350
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 15/100
+Epoch 15, Train Loss : 0.49658391, val_loss : 0.56352396
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 16/100
+Epoch 16, Train Loss : 0.48546835, val_loss : 0.57406158
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 17/100
+Epoch 17, Train Loss : 0.47544222, val_loss : 0.58692700
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 18/100
+Epoch 18, Train Loss : 0.46836797, val_loss : 0.55544129
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch18_train_loss0.4684_val_loss0.5554.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch13_train_loss0.5152_val_loss0.5631.pth
+Epoch 19/100
+Epoch 19, Train Loss : 0.45781045, val_loss : 0.55440706
+best validation loss updated
+Checkpoint saved at ./checkpoints/2024-10-09_11.42.28/cp_epoch19_train_loss0.4578_val_loss0.5544.pth
+checkpoint removed : ./checkpoints/2024-10-09_11.42.28/cp_epoch18_train_loss0.4684_val_loss0.5554.pth
+Epoch 20/100
+Epoch 20, Train Loss : 0.44455660, val_loss : 0.55883392
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 21/100
+Epoch 21, Train Loss : 0.43892233, val_loss : 0.59027117
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 22/100
+Epoch 22, Train Loss : 0.42906251, val_loss : 0.56666890
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 23/100
+Epoch 23, Train Loss : 0.42378505, val_loss : 0.57278004
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 24/100
+Epoch 24, Train Loss : 0.41335623, val_loss : 0.60051884
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 25/100
+Epoch 25, Train Loss : 0.40588888, val_loss : 0.56805726
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 26/100
+Epoch 26, Train Loss : 0.40121715, val_loss : 0.56014069
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 27/100
+Epoch 27, Train Loss : 0.35118279, val_loss : 0.57366252
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 28/100
+Epoch 28, Train Loss : 0.34244629, val_loss : 0.57294984
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+Epoch 29/100
+Epoch 29, Train Loss : 0.33944870, val_loss : 0.57049191
+EarlyStop : 더이상 개선이 없어 학습이 중단됩니다
+training for 28 / 100 epochs finished
+best train loss : 0.33945, best val loss : 0.55441
+last train loss : 0.33944870270432587, last val loss : 0.5704919132108824
