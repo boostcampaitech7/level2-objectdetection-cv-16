@@ -51,9 +51,9 @@
         "num_models_to_save" : 1,
         "earlystop" : 10,
         "result_path" : "./checkpoints",
-        "resume" : false,
-        "resume_model_path" : "/data/ephemeral/home/kwak/level2-objectdetection-cv-16/checkpoints/2024-10-09_03.18.49/cp_epoch2_train_loss0.9940_val_loss0.9188.pth",
-        "verbose" : false
+        "resume" : true,
+        "resume_model_path" : "checkpoints/2024-10-09_03.36.44/cp_epoch4_train_loss0.6567_val_loss0.6259.pth",
+        "verbose" : true
     },
 
     "optimizer": {

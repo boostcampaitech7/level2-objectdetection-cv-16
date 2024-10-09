@@ -143,15 +143,16 @@ class Trainer: # 변수 넣으면 바로 학습되도록
                 self.keep_top_k_checkpoints(k=self.k)
             else:
                 count += 1
-                print("EarlyStop : 더이상 개선이 없어 학습이 중단됩니다")
-                break 
+                if count == self.earlystop:
+                    print("EarlyStop : 더이상 개선이 없어 학습이 중단됩니다")
+                    break
             
             if type(self.scheduler) == optim.lr_scheduler.ReduceLROnPlateau:
                 self.scheduler.step(val_loss)
             elif self.scheduler:
                 self.scheduler.step()
         
-        print(f"training for {self.epochs} epochs finished")
+        print(f"training for {epoch} / {self.epochs} epochs finished")
         print(f"best train loss : {self.best_train_loss:.5f}, best val loss : {self.best_val_loss:.5f}")
         print(f"last train loss : {train_loss}, last val loss : {val_loss}")
     
