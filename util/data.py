@@ -85,8 +85,6 @@ class CustomDataset(Dataset):
     def __len__(self) -> int:
         return len(self.image_id)
     
-
-    
 def get_kfold_json(
     k:int = 5, 
     data_path: str = './dataset',

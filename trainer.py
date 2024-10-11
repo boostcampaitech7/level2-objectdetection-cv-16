@@ -226,9 +226,10 @@ if __name__=='__main__':
 
     from util.optimizers import get_optimizer
     from util.schedulers import get_scheduler
-    from config.custom_json_parser import Custom_json_parser
+
+    from json_settings.custom_json_parser import Custom_json_parser
     
-    config_json_path = "config/train_config.json"
+    config_json_path = "json_settings/train_config.json"
 
     config_parser = Custom_json_parser(mode="train", config_json_path=config_json_path)
     config = config_parser.get_config_from_json()
@@ -239,89 +240,41 @@ if __name__=='__main__':
     
     img_size = config['data']['img_size']
     
-    from mmdet.datasets import build_dataset, build_dataloader
-    from mmcv import Config
-    from mmdet.utils import get_device, build_dp
+    
+    ## mmdetection implementation
+    from mmengine.config import Config, DictAction
+    from util.dataloader_builder import build_dataloader
+    from mmdet.datasets.coco import CocoDataset
+    from mmengine.registry import DATASETS
     
     classes = ("General trash", "Paper", "Paper pack", "Metal", "Glass", 
            "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing")
-
-    ## mmdetection implementation
-    cfg = Config.fromfile('./configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py')
     
-    root = "./dataset/"
-
-    cfg.data.train.classes = classes
-    cfg.data.train.img_prefix = root
-    cfg.data.train.ann_file = root + '10-fold_json/train_fold_1.json' # train json 정보
-    cfg.data.train.pipeline[2]['img_scale'] = (1024,1024) # Resize
-
-    cfg.data.val.classes = classes
-    cfg.data.val.img_prefix = root
-    cfg.data.val.ann_file = root + '10-fold_json/val_fold_1.json'
-    cfg.data.val.pipeline[2]['img_scale'] = (1024, 1024)
-
-    cfg.data.test.classes = classes
-    cfg.data.test.img_prefix = root
-    cfg.data.test.ann_file = root + 'test.json' # test json 정보
-    cfg.data.test.pipeline[1]['img_scale'] = (1024,1024) # Resize
-
-    cfg.data.samples_per_gpu = 8
-
-    cfg.seed = 2024
-    cfg.gpu_ids = [0]
-    cfg.work_dir = 'asd'
-
-    cfg.model.roi_head.bbox_head.num_classes = 10
-
-    cfg.optimizer_config.grad_clip = dict(max_norm=35, norm_type=2)
-    cfg.checkpoint_config = dict(max_keep_ckpts=3, interval=1)
-    cfg.device = get_device()
+    cfg = Config.fromfile('configs/faster_rcnn/faster-rcnn_r50_fpn_1x_coco.py')
     
-    train_datasets = build_dataset(cfg.data.train)
-    val_datasets = build_dataset(cfg.data.val) #, dict(test_mode=False))
+    root = './dataset'
     
-    runner_type = 'EpochBasedRunner' if 'runner' not in cfg else cfg.runner['type']
+    cfg._cfg_dict['data_root'] = root
+    cfg._cfg_dict['train_pipeline'][2]['scale'] = (1024, 1024)
+    cfg._cfg_dict['train_dataloader']['dataset']['data_root'] = root
+    cfg._cfg_dict['train_dataloader']['dataset']['ann_file'] = root + '/10-fold_json/val_fold_1.json'
+    cfg._cfg_dict['train_dataloader']['dataset']['pipeline'][2]['scale'] = (1024, 1024)
+    
+    cfg._cfg_dict['data_root'] = root
+    cfg._cfg_dict['test_pipeline'][1]['scale'] = (1024, 1024)
+    cfg._cfg_dict['val_dataloader']['dataset']['data_root'] = root
+    cfg._cfg_dict['val_dataloader']['dataset']['ann_file'] = root + '/10-fold_json/val_fold_1.json'
+    cfg._cfg_dict['val_dataloader']['dataset']['pipeline'][1]['scale'] = (1024, 1024)
+    
+    cfg._cfg_dict['model']['roi_head']['bbox_head']['num_classes'] = 10
+    
+    train_dataloader = build_dataloader(cfg.get('train_dataloader'))
+    val_dataloader = build_dataloader(cfg.get('val_dataloader'))
 
-    train_dataloader_default_args = dict(
-        samples_per_gpu=8,
-        workers_per_gpu=2,
-        # `num_gpus` will be ignored if distributed
-        num_gpus=len(cfg.gpu_ids),
-        dist=False,
-        seed=cfg.seed,
-        runner_type=runner_type,
-        persistent_workers=False)
-
-    train_loader_cfg = {
-        **train_dataloader_default_args,
-        **cfg.data.get('train_dataloader', {})
-    }
+    from model.model_builder import build_model
     
-    val_dataloader_default_args = dict(
-        samples_per_gpu=4,
-        workers_per_gpu=2,
-        num_gpus=len(cfg.gpu_ids),
-        dist=False,
-        shuffle=False,
-        runner_type=runner_type,
-        persistent_workers=False)
-
-    val_dataloader_args = {
-        **val_dataloader_default_args,
-        **cfg.data.get('val_dataloader', {})
-    }
-    
-    val_dataloader = build_dataloader(val_datasets, **val_dataloader_args)
-    train_dataloader = build_dataloader(train_datasets, **train_loader_cfg)
-    
-
-    from mmdet.models import build_detector
-    
-    model = build_detector(cfg.model)
+    model = build_model(cfg['model'])
     model.init_weights()
-    
-    model = build_dp(model, cfg.device, device_ids=cfg.gpu_ids)
     
     ## end mmdetection implementation
     ## Optimizer 
