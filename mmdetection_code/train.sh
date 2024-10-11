@@ -1,2 +1,1 @@
-
-python -u train.py /data/ephemeral/home/mmdetection/Custom/Co-DETR.py --work-dir ./work_dir/DETR --seed 2024
+python -u mmdetection_code/train.py mmdetection_code/exp_configs.py --work-dir ./work_dir/DETR --seed 2024

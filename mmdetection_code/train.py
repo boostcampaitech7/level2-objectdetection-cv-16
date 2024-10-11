@@ -20,6 +20,7 @@ def parse_args():
     'specify, try to auto resume from the latest checkpoint '
     'in the work directory.')
     parser.add_argument('--seed', type=int, default=2024, help='random_seed to be fixed')
+    return parser.parse_args()
     
 def main():
     args = parse_args()

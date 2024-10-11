@@ -1,5 +1,5 @@
 _base_ = [
- '../configs/_base_/datasets/coco_detection.py', '../configs/_base_/default_runtime.py'
+ '../mmdetection/configs/_base_/datasets/coco_detection.py', '../mmdetection/configs/_base_/default_runtime.py'
 ]
 
 ## Model
@@ -102,7 +102,7 @@ model = dict(
     
 ## Pipeline
 dataset_type = 'CocoDataset'
-data_root ='/data/ephemeral/home/dataset/'
+data_root ='/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset'
 classes = ("General trash", "Paper", "Paper pack", "Metal", "Glass",
             "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing")
 backend_args = None
@@ -154,7 +154,7 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='split/train_42_fold_2.json',
+        ann_file='10-fold_json/train_fold_1.json',
         data_prefix=dict(img=''),
         filter_cfg=dict(filter_empty_gt=True),
         metainfo=dict(classes=classes),
@@ -172,7 +172,7 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='split/val_42_fold_2.json',
+        ann_file='10-fold_json/val_fold_1.json',
         data_prefix=dict(img=''),
         test_mode=True,
         metainfo=dict(classes=classes),
@@ -200,12 +200,12 @@ test_dataloader = dict(
 ## evaluator
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'split/val_42_fold_2.json',
+    ann_file=data_root + '/10-fold_json/val_fold_1.json',
     metric=['bbox'],
     format_only=False,
     backend_args=backend_args)
 test_evaluator = dict(
-    ann_file=data_root + 'split/val_42_fold_2.json')
+    ann_file=data_root + '/10-fold_json/val_fold_1.json')
 
 ## schedule & optimizer
 optim_wrapper = dict(

@@ -132,3 +132,7 @@ config.txt
 log
 
 mmdetection
+
+work_dir
+
+visualizations
