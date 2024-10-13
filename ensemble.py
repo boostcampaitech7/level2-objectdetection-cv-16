@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from ensemble_boxes import weighted_boxes_fusion
+from ensemble_boxes import nms, soft_nms, non_maximum_weighted, weighted_boxes_fusion
 
 def parse_prediction_string(pred_str):
     records = pred_str.strip().split(' ')
@@ -27,7 +27,7 @@ def format_prediction_string(boxes, scores, labels):
         pred_str += f"{int(labels[i])} {scores[i]:.4f} {boxes[i][0]:.2f} {boxes[i][1]:.2f} {boxes[i][2]:.2f} {boxes[i][3]:.2f} "
     return pred_str.strip()
 
-def perform_wbf_on_files(file_paths, iou_thr=0.55, skip_box_thr=0.001, weights=None):
+def perform_wbf_on_files(file_paths, iou_thr=0.5, skip_box_thr=0.001, weights=None, sigma=0.1, mode="wbf"):
     all_predictions = []
     
     for file_path in file_paths:
@@ -54,9 +54,22 @@ def perform_wbf_on_files(file_paths, iou_thr=0.55, skip_box_thr=0.001, weights=N
         scores_list = [pred[2] for pred in image_predictions]
         labels_list = [pred[3] for pred in image_predictions]
         
-        boxes, scores, labels = weighted_boxes_fusion(
-            boxes_list, scores_list, labels_list, weights=weights, iou_thr=iou_thr, skip_box_thr=skip_box_thr
-        )
+        if mode == "nms":            
+            boxes, scores, labels = nms(
+                boxes_list, scores_list, labels_list, weights=weights, iou_thr=iou_thr
+            )
+        elif mode == "soft_nms":
+            boxes, scores, labels = soft_nms(
+                boxes_list, scores_list, labels_list, weights=weights, iou_thr=iou_thr, sigma=sigma, thresh=skip_box_thr
+            )
+        elif mode == "nmw":
+            boxes, scores, labels = non_maximum_weighted(
+                boxes_list, scores_list, labels_list, weights=weights, iou_thr=iou_thr, skip_box_thr=skip_box_thr
+            )
+        else:
+            boxes, scores, labels = weighted_boxes_fusion(
+                boxes_list, scores_list, labels_list, weights=weights, iou_thr=iou_thr, skip_box_thr=skip_box_thr
+            )
         
         boxes = boxes * 1024.0
         
@@ -70,6 +83,14 @@ def perform_wbf_on_files(file_paths, iou_thr=0.55, skip_box_thr=0.001, weights=N
     result_df = pd.DataFrame(results)
     return result_df
 
-file_paths = ['/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/output.csv', '/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/work_dirs/yolox_x_49/submission.csv']
-wbf_result_df = perform_wbf_on_files(file_paths)
-wbf_result_df.to_csv('wbf_ensemble_result.csv', index=False)
+file_paths = [
+    '/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/output.csv', 
+    '/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/work_dirs/yolox_x_49/submission.csv'
+]
+iou_thr=0.55
+skip_box_thr=0.001
+weights=None
+sigma=0.1
+mode="wbf"
+result_df = perform_wbf_on_files(file_paths, iou_thr=iou_thr, skip_box_thr=skip_box_thr, weights=weights, sigma=sigma, mode=mode)
+result_df.to_csv('ensemble_result.csv', index=False)
