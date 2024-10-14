@@ -3,6 +3,7 @@
 /data
 /baseline
 /dataset
+/work_dirs
 *.csv
 
 # Byte-compiled / optimized / DLL files

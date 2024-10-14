@@ -29,7 +29,7 @@ def create_subset_json(coco, img_ids, output_json):
 
 def multilabelStratifiedKFold_split_json(
     k:int = 5, 
-    output_dir: str = "/data/ephemeral/home/whth/level2-objectdetection-cv-16/dataset/kfold_dataset",
+    output_dir: str = "/data/ephemeral/home/whth/level2-objectdetection-cv-16/dataset/kfold",
     annotation_file: str='/data/ephemeral/home/whth/level2-objectdetection-cv-16/dataset/train.json',
     random_state: int=2024
     ) -> None:
