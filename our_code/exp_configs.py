@@ -3,103 +3,64 @@ _base_ = [
 ]
 
 ## Model
-pretrained = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'
+model_name = 'ViTDet'
+
+custom_imports = dict(imports=['projects.ViTDet.vitdet'])
+
+backbone_norm_cfg = dict(type='LN', requires_grad=True)
+norm_cfg = dict(type='LN2d', requires_grad=True)
+image_size = (1024, 1024)
+batch_augments = [
+    dict(type='BatchFixedSizePad', size=image_size, pad_mask=True)
+]
+
+# model settings
 model = dict(
-    type='DDQDETR',
-    num_queries=900, # num_matching_queries
-    # ratio of num_dense queries to num_queries
-    dense_topk_ratio=1.5,
-    with_box_refine=True,
-    as_two_stage=True,
-    data_preprocessor=dict(
-        type='DetDataPreprocessor',
-        mean=[123.675, 116.28, 103.53],
-        std=[58.395, 57.12, 57.375],
-        bgr_to_rgb=True,
-        pad_size_divisor=1),
+    data_preprocessor=dict(pad_size_divisor=32, batch_augments=batch_augments),
     backbone=dict(
-        type='SwinTransformer',
-        pretrain_img_size=384,
-        embed_dims=192,
-        depths=[2, 2, 18, 2],
-        num_heads=[6, 12, 24, 48],
-        window_size=12,
+        _delete_=True,
+        type='ViT',
+        img_size=1024,
+        patch_size=16,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        drop_path_rate=0.1,
+        window_size=14,
         mlp_ratio=4,
         qkv_bias=True,
-        qk_scale=None,
-        drop_rate=0.,
-        attn_drop_rate=0.,
-        drop_path_rate=0.2,
-        patch_norm=True,
-        out_indices=(1, 2, 3),
-        with_cp=False,
-        convert_weights=True,
-        init_cfg=dict(type='Pretrained', checkpoint=pretrained)),
+        norm_cfg=backbone_norm_cfg,
+        window_block_indexes=[
+            0,
+            1,
+            3,
+            4,
+            6,
+            7,
+            9,
+            10,
+        ],
+        use_rel_pos=True,
+        init_cfg=dict(
+            type='Pretrained', checkpoint='mae_pretrain_vit_base.pth')),
     neck=dict(
-        type='ChannelMapper',
-        in_channels=[384, 768, 1536],
-        kernel_size=1,
+        _delete_=True,
+        type='SimpleFPN',
+        backbone_channel=768,
+        in_channels=[192, 384, 768, 768],
         out_channels=256,
-        act_cfg=None,
-        norm_cfg=dict(type='GN', num_groups=32),
-        num_outs=4),
-    # encoder class name: DeformableDetrTransformerEncoder
-    encoder=dict(
-        num_layers=6,
-        layer_cfg=dict(
-            self_attn_cfg=dict(embed_dims=256, num_levels=4,
-                        dropout=0.0), # 0.1 for DeformDETR
-            ffn_cfg=dict(
-                embed_dims=256,
-                feedforward_channels=2048, # 1024 for DeformDETR
-                ffn_drop=0.0))), # 0.1 for DeformDETR
-    # decoder class name: DDQTransformerDecoder
-    decoder=dict(
-        num_layers=6,
-        return_intermediate=True,
-        layer_cfg=dict(
-            self_attn_cfg=dict(embed_dims=256, num_heads=8,
-                                dropout=0.0), # 0.1 for DeformDETR
-            cross_attn_cfg=dict(embed_dims=256, num_levels=4,
-                                dropout=0.0), # 0.1 for DeformDETR
-            ffn_cfg=dict(
-                embed_dims=256,
-                feedforward_channels=2048, # 1024 for DeformDETR
-                ffn_drop=0.0)), # 0.1 for DeformDETR
-        post_norm_cfg=None),
-    positional_encoding=dict(
-        num_feats=128,
-        normalize=True,
-        offset=0.0, # -0.5 for DeformDETR
-        temperature=20), # 10000 for DeformDETR
-    bbox_head=dict(
-        type='DDQDETRHead',
-        num_classes=10,
-        sync_cls_avg_factor=True,
-        loss_cls=dict(
-            type='FocalLoss',
-            use_sigmoid=True,
-            gamma=2.0,
-            alpha=0.25,
-            loss_weight=1.0),
-        loss_bbox=dict(type='L1Loss', loss_weight=5.0),
-        loss_iou=dict(type='GIoULoss', loss_weight=2.0)),
-    dn_cfg=dict(
-        label_noise_scale=0.5,
-        box_noise_scale=1.0,
-        group_cfg=dict(dynamic=True, num_groups=None, num_dn_queries=100)),
-    dqs_cfg=dict(type='nms', iou_threshold=0.8),
-    # training and testing settings
-    train_cfg=dict(
-        assigner=dict(
-        type='HungarianAssigner',
-        match_costs=[
-            dict(type='FocalLossCost', weight=2.0),
-            dict(type='BBoxL1Cost', weight=5.0, box_format='xywh'),
-            dict(type='IoUCost', iou_mode='giou', weight=2.0)
-        ])),
-    test_cfg=dict(max_per_img=300))
-    
+        num_outs=5,
+        norm_cfg=norm_cfg),
+    rpn_head=dict(num_convs=2),
+    roi_head=dict(
+        bbox_head=dict(
+            type='Shared4Conv1FCBBoxHead',
+            conv_out_channels=256,
+            norm_cfg=norm_cfg),
+        mask_head=dict(norm_cfg=norm_cfg)))
+
+custom_hooks = [dict(type='Fp16CompresssionHook')]
+
 ## Pipeline
 dataset_type = 'CocoDataset'
 data_root ='/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset'
@@ -220,7 +181,7 @@ optim_wrapper = dict(
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.05)}))
 
 # learning policy
-max_epochs = 30
+max_epochs = 50
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 val_cfg = dict(type='ValLoop')
@@ -248,7 +209,7 @@ vis_backends = [
     dict(type='WandbVisBackend',
         init_kwargs={
         'project': 'mmdetection',
-        'name': 'DDQ-DETR'
+        'name': model_name
     })
 ]
 default_scope = 'mmdet'
