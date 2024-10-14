@@ -69,7 +69,7 @@ def multilabelStratifiedKFold_split_json(
 
 if __name__=='__main__':
     # 여기서 k개의 폴드로 나눌지, output_dir 경로, annotation_file 경로, random_state 원하면 설정
-    k = 5
-    output_dir = "/data/ephemeral/home/whth/level2-objectdetection-cv-16/dataset/kfold_dataset"
-    annotation_file ='/data/ephemeral/home/whth/level2-objectdetection-cv-16/dataset/train.json'
+    k = 10
+    output_dir = f"dataset/stratified_{k}fold_dataset"
+    annotation_file ='dataset/train.json'
     multilabelStratifiedKFold_split_json(k=k, output_dir=output_dir, annotation_file=annotation_file)
