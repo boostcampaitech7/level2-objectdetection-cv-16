@@ -1,1 +1,1 @@
-python -u our_code/train.py our_code/exp_configs.py --work-dir ./work_dir/ViTDet --seed 2024
+python -u ./our_code/train.py --config ./our_code/exp_configs.py --work-dir ./work_dir/ViTDet --seed 2024

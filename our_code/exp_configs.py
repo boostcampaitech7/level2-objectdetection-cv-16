@@ -1,5 +1,6 @@
 _base_ = [
- '../mmdetection/configs/_base_/datasets/coco_detection.py', '../mmdetection/configs/_base_/default_runtime.py'
+ '../mmdetection/configs/_base_/datasets/coco_detection.py', '../mmdetection/configs/_base_/default_runtime.py',
+ '../mmdetection/configs/_base_/models/mask-rcnn_r50_fpn.py'
 ]
 
 ## Model
@@ -57,7 +58,9 @@ model = dict(
             type='Shared4Conv1FCBBoxHead',
             conv_out_channels=256,
             norm_cfg=norm_cfg),
-        mask_head=dict(norm_cfg=norm_cfg)))
+        mask_head=dict(norm_cfg=norm_cfg))
+    )
+
 
 custom_hooks = [dict(type='Fp16CompresssionHook')]
 
@@ -175,10 +178,15 @@ test_evaluator = dict(
 
 ## schedule & optimizer
 optim_wrapper = dict(
-    type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=0.0002, weight_decay=0.05),
+    type='AmpOptimWrapper',
+    optimizer=dict(type='AdamW', lr=0.0001, betas=(0.9, 0.999), weight_decay=0.1),
     clip_grad=dict(max_norm=0.1, norm_type=2),
-    paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.05)}))
+    constructor='LayerDecayOptimizerConstructor',
+    paramwise_cfg={
+        'decay_rate': 0.7,
+        'decay_type': 'layer_wise',
+        'num_layers': 12,
+    })
 
 # learning policy
 max_epochs = 50
