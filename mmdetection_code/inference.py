@@ -19,7 +19,7 @@ cfg = Config.fromfile(args.config)
 model = init_detector(cfg, args.checkpoint, device='cuda:0')
 
 # COCO 객체 생성
-coco = COCO('/data/ephemeral/home/dataset/test.json')
+coco = COCO('/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset/test.json')
 img_ids = coco.getImgIds()
 prediction_strings = []
 file_names = []
@@ -29,7 +29,7 @@ for img_id in tqdm(img_ids):
     file_names.append(img_info['file_name'])
 
     # 추론 수행
-    img_path = os.path.join('/data/ephemeral/home/dataset', img_info['file_name'])
+    img_path = os.path.join('/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset', img_info['file_name'])
     result = inference_detector(model, img_path)
 
     prediction_string = ''

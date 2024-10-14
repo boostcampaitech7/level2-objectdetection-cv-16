@@ -122,8 +122,8 @@ train_pipeline = [
                     (736, 1333), (768, 1333), (800, 1333)],
                     keep_ratio=True)
                 ],
-                [
-                    dict(
+            [
+                dict(
                     type='RandomChoiceResize',
                     # The radio of all image in train dataset < 7
                     # follow the original implement

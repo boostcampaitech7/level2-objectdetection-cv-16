@@ -1,2 +1,1 @@
-
-python inference.py --config /path/to/config.py --checkpoint /path/to/checkpoint.pth --output submission_output.csv
+python mmdetection_code/inference.py --config work_dir/DETR/exp_configs.py --checkpoint work_dir/DETR/epoch_30.pth --output work_dir/DETR/submission_output.csv
