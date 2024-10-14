@@ -1,0 +1,1 @@
+python -u mmdetection_code/train.py mmdetection_code/exp_configs.py --work-dir ./work_dir/DETR --seed 2024
