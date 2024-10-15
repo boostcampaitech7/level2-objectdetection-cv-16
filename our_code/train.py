@@ -7,6 +7,8 @@ from mmengine.runner import Runner
 from mmdet.registry import VISUALIZERS
 from mmdet.utils import register_all_modules
 
+import wandb
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train detection')
     parser.add_argument('--config', default='our_code/exp_configs.py', type=str, help='train config file path')
@@ -23,6 +25,8 @@ def parse_args():
     return parser.parse_args()
     
 def main():
+    wandb.login(key='2a631ea744b03506a1330798e0724d1d917a821f')
+    
     args = parse_args()
     register_all_modules()
     
