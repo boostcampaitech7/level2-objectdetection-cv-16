@@ -1,7 +1,11 @@
 import streamlit as st
 import plotly.express as px
 
-def show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES):
+def show(train_df, bbox_df):
+    LABEL_COLORS = ['rgb(208, 56, 78)', 'rgb(238, 100, 69)', 'rgb(250, 155, 88)', 'rgb(254, 206, 124)', 'rgb(255, 241, 168)', 'rgb(244, 250, 173)', 'rgb(209, 237, 156)', 'rgb(151, 213, 164)', 'rgb(92, 183, 170)', 'rgb(54, 130, 186)']
+    LABEL_COLORS_WOUT_NO_FINDING = LABEL_COLORS[:8]+LABEL_COLORS[9:]
+    CLASSES = ["General trash", "Paper", "Paper pack", "Metal", "Glass", "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing"]
+
     fig_hist = px.histogram(
         train_df.image_id.value_counts(), 
         log_y=True, 
