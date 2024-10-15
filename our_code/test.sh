@@ -1,1 +1,1 @@
-python mmdetection_code/inference.py --config work_dir/DETR/exp_configs.py --checkpoint work_dir/DETR/epoch_30.pth --output work_dir/DETR/submission_output.csv
+python our_code/inference.py --config work_dir/DDQDETR_Stratifeid_10fold/exp_configs.py --checkpoint work_dir/DDQDETR_Stratifeid_10fold/epoch_30.pth --output work_dir/DDQDETR_Stratifeid_10fold/submission_output.csv
