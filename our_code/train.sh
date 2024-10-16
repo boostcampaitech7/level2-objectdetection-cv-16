@@ -1,1 +1,1 @@
-python -u ./our_code/train.py --config ./our_code/exp_configs_co_detr.py --work-dir ./work_dir/co_detr_skfold_1st --seed 2024
+python -u ./our_code/train.py --config ./our_code/exp_configs_co_detr.py --work-dir ./work_dir/co_detr_skfold_1st --resume ./work_dir/co_detr_skfold_1st/epoch_5.pth --seed 2024
