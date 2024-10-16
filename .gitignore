@@ -4,6 +4,7 @@
 /baseline
 /dataset
 /work_dirs
+/wandb
 *.csv
 /work_dirs
 
