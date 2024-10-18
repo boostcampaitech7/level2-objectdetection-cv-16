@@ -1,1 +1,1 @@
-python our_code/inference.py --config work_dir/DDQDETR_Stratifeid_10fold/exp_configs.py --checkpoint work_dir/DDQDETR_Stratifeid_10fold/epoch_30.pth --output work_dir/DDQDETR_Stratifeid_10fold/submission_output.csv
+python our_code/inference.py --config work_dir/co_detr_skfold_1st/exp_configs_co_detr.py --checkpoint work_dir/co_detr_skfold_1st/best_coco_bbox_mAP_50_epoch_25.pth --output work_dir/co_detr_skfold_1st/submission_output.csv
