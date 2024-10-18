@@ -9,7 +9,7 @@ from mmdet.utils import register_all_modules
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train detection')
-    parser.add_argument('--config', default='mmdetection_code/exp_configs.py' type=str, help='train config file path')
+    parser.add_argument('--config', default='mmdetection_code/exp_configs.py', type=str, help='train config file path')
     parser.add_argument('--work-dir', default='work_dir/DETR', type=str, help='the dir to save logs and models')
     parser.add_argument(
     '--resume',
