@@ -19,7 +19,7 @@ cfg = Config.fromfile(args.config)
 model = init_detector(cfg, args.checkpoint, device='cuda:0')
 
 # COCO 객체 생성
-coco = COCO('/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset/test.json')
+coco = COCO('dataset/stratified_5fold_dataset/val_fold_1.json')
 img_ids = coco.getImgIds()
 prediction_strings = []
 file_names = []

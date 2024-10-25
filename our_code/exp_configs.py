@@ -1,6 +1,10 @@
 _base_ = [
- '../mmdetection/configs/_base_/datasets/coco_detection.py', '../mmdetection/configs/_base_/default_runtime.py'
+ '../mmdetection/configs/_base_/datasets/coco_detection.py',
+ '../mmdetection/configs/_base_/default_runtime.py',
 ]
+
+## Model
+model_name = 'DDQDETR'
 
 ## Model
 pretrained = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'
@@ -99,7 +103,7 @@ model = dict(
             dict(type='IoUCost', iou_mode='giou', weight=2.0)
         ])),
     test_cfg=dict(max_per_img=300))
-    
+
 ## Pipeline
 dataset_type = 'CocoDataset'
 data_root ='/data/ephemeral/home/kwak/level2-objectdetection-cv-16/dataset'
@@ -241,6 +245,7 @@ param_scheduler = [
         gamma=0.1)
 ]
 
+
 ## checkpoint & hooks
 auto_scale_lr = dict(base_batch_size=16)
 vis_backends = [
@@ -248,15 +253,15 @@ vis_backends = [
     dict(type='WandbVisBackend',
         init_kwargs={
         'project': 'mmdetection',
-        'name': 'DDQ-DETR'
+        'name': model_name
     })
 ]
 default_scope = 'mmdet'
 default_hooks = dict(
     timer=dict(type='IterTimerHook'),
-    logger=dict(type='LoggerHook', interval=50),
+    logger=dict(type='LoggerHook', interval=100),
     param_scheduler=dict(type='ParamSchedulerHook'),
-    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=3),
+    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=2),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='DetVisualizationHook'))
 env_cfg = dict(

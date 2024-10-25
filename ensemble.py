@@ -84,8 +84,8 @@ def perform_wbf_on_files(file_paths, iou_thr=0.5, skip_box_thr=0.001, weights=No
     return result_df
 
 file_paths = [
-    '/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/output.csv', 
-    '/data/ephemeral/home/sejongmin/level2-objectdetection-cv-16/work_dirs/yolox_x_49/submission.csv'
+    'ensemble_result.csv', 
+    'en_ddq_cascade_resnext_yolox.csv'
 ]
 iou_thr=0.55
 skip_box_thr=0.001
