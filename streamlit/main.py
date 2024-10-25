@@ -3,9 +3,6 @@ import streamlit as st
 from pycocotools.coco import COCO
 import eda, visualize_detection, compare_detection
 
-LABEL_COLORS = ['rgb(208, 56, 78)', 'rgb(238, 100, 69)', 'rgb(250, 155, 88)', 'rgb(254, 206, 124)', 'rgb(255, 241, 168)', 'rgb(244, 250, 173)', 'rgb(209, 237, 156)', 'rgb(151, 213, 164)', 'rgb(92, 183, 170)', 'rgb(54, 130, 186)']
-LABEL_COLORS_WOUT_NO_FINDING = LABEL_COLORS[:8]+LABEL_COLORS[9:]
-CLASSES = ["General trash", "Paper", "Paper pack", "Metal", "Glass", "Plastic", "Styrofoam", "Plastic bag", "Battery", "Clothing"]
 class_colors = {
     'General trash': (208, 56, 78), 
     'Paper': (238, 100, 69),
@@ -20,8 +17,8 @@ class_colors = {
 }
 
 @st.cache_data
-def load_train_df():
-    coco = COCO('./dataset/train.json')
+def load_train_df(json_path='./dataset/train.json'):
+    coco = COCO(json_path)
     train_df = pd.DataFrame()
     image_ids = []
     class_name = []
@@ -41,7 +38,7 @@ def load_train_df():
             
         for ann in anns:
             image_ids.append(file_name)
-            class_name.append(CLASSES[ann['category_id']])
+            class_name.append(list(class_colors.keys())[ann['category_id']])
             class_id.append(ann['category_id'])
             x_min.append(float(ann['bbox'][0]))
             y_min.append(float(ann['bbox'][1]))
@@ -99,7 +96,7 @@ def load_test_df(csv_path):
             # Append values to the corresponding lists
             image_ids.append(image_id)
             class_id.append(class_id_value)
-            class_name.append(CLASSES[class_id_value])
+            class_name.append(list(class_colors.keys())[class_id_value])
             x_min.append(x_min_value)
             y_min.append(y_min_value)
             x_max.append(x_max_value)
@@ -116,46 +113,71 @@ def load_test_df(csv_path):
 
     return test_df
 
-st.sidebar.success("CV16 오늘도 화이팅하조!")
-menu = st.sidebar.radio("menu", ["데이터 분포 확인하기", "객체 탐지 확인하기"])
-
 if "test_df" not in st.session_state:
     st.session_state.test_df = pd.DataFrame({"image_id": [f"test/{str(i).zfill(4)}.jpg" for i in range(4871)]})
-if "train_df" not in st.session_state:
-    st.session_state.train_df = pd.DataFrame()
+if "train_df" not in st.session_state and "bbox_df" not in st.session_state:
+    st.session_state.train_df, st.session_state.bbox_df = load_train_df()
+if "pred_df" not in st.session_state:
+    st.session_state.pred_df = pd.DataFrame()
+if "size" not in st.session_state and "anno" not in st.session_state:
+    st.session_state.size = "All"
+    st.session_state.anno = "All"
 
-train_df, bbox_df = load_train_df()
+st.sidebar.success("CV16 오늘도 화이팅하조!")
+with st.sidebar.form(key="json_form"):
+    json_path = st.text_input("json file path")
+    submit_button = st.form_submit_button("OK")
+    if submit_button:
+        try:
+            st.session_state.train_df, st.session_state.bbox_df = load_train_df(json_path)
+            st.sidebar.success("json file load successed :)")
+        except Exception:
+            st.session_state.train_df, st.session_state.bbox_df = load_train_df()
+            st.sidebar.error("json file load failed :(")
+
+menu = st.sidebar.radio("menu", ["데이터 분포 확인하기", "객체 탐지 확인하기"])
 
 if menu == "데이터 분포 확인하기":
     st.markdown("<h2 style='text-align: center;'>데이터 분포 확인하기</h2>", unsafe_allow_html=True)
-    eda.show(train_df, bbox_df, LABEL_COLORS, LABEL_COLORS_WOUT_NO_FINDING, CLASSES)
+    eda.show(st.session_state.train_df, st.session_state.bbox_df)
+
 elif menu == "객체 탐지 확인하기":
     st.markdown("<h2 style='text-align: center;'>객체 탐지 확인하기</h2>", unsafe_allow_html=True)
     option = st.sidebar.radio("option", ["train images", "test images"])
     if option == "train images":
         with st.sidebar.form(key="form"):
             csv_path = st.text_input("csv file path")
+            st.session_state.size = st.selectbox("select bbox size", ["All", "Small", "Medium", "Large"])
+            st.session_state.anno = st.selectbox("select annotation", ["All", 'General trash', 'Paper', 'Paper pack', 'Metal', 'Glass', 'Plastic', 'Styrofoam', 'Plastic bag', 'Battery', 'Clothing'])
             submit_button = st.form_submit_button("OK")
-        if submit_button and csv_path:
+        if submit_button:
             try:
-                st.session_state.train_df = load_test_df(csv_path)
+                st.session_state.pred_df = load_test_df(csv_path)
                 st.sidebar.success("csv file load successed :)")
             except Exception:
+                st.session_state.pred_df = pd.DataFrame()
                 st.sidebar.error("csv file load failed :(")
 
-        if st.session_state.train_df.empty:
+        if st.session_state.pred_df.empty:
+            st.session_state.image_ids = [img_id for img_id in st.session_state.train_df.groupby("image_id")["image_id"].first().tolist()]
             image_count = st.sidebar.slider('Select image count', 1, 8, 4)
-            image_id = st.sidebar.slider('Select image id', 0, len(train_df.groupby("image_id")) - (5 * image_count), 0)
-            st.sidebar.write('image id:', image_id)
-            for i in range(image_id, image_id + 5 * image_count, image_count):
-                image_ids = [f"train/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
-                visualize_detection.show(train_df, image_ids, class_colors)
+            image_index = st.sidebar.slider('Select image id', 0, len(st.session_state.image_ids) - (5 * image_count), 0)
+            image_index_input = st.sidebar.number_input('Enter image count', min_value=0, max_value=len(st.session_state.image_ids)-(5*image_count), value=image_index, step=5*image_count)
+            if image_index != image_index_input:
+                image_index = image_index_input
+            for i in range(image_index, image_index + 5 * image_count, image_count):
+                image_ids = [st.session_state.image_ids[j] for j in range(i, i + image_count)]
+                visualize_detection.show(st.session_state.train_df, image_ids, class_colors)
             
         else:
-            image_id = st.sidebar.slider('Select image id', 0, len(train_df.groupby("image_id")) - 5, 0)
-            st.sidebar.write('image id:', image_id)
-            image_ids = [f"train/{str(j).zfill(4)}.jpg" for j in range(image_id, image_id + 5)]
-            compare_detection.show(train_df, st.session_state.train_df, image_ids, class_colors)
+            st.session_state.image_ids = [img_id for img_id in st.session_state.pred_df.groupby("image_id")["image_id"].first().tolist()]
+            image_index = st.sidebar.slider('Select image id', 0, len(st.session_state.image_ids) - 5, 0)
+            image_index_input = st.sidebar.number_input('Enter image count', min_value=0, max_value=len(st.session_state.image_ids)-5, value=image_index, step=5)
+            if image_index != image_index_input:
+                image_index = image_index_input
+            image_ids = [st.session_state.image_ids[i] for i in range(image_index, image_index + 5)]
+            st.sidebar.write('image index:', image_index)
+            compare_detection.show(st.session_state.train_df, st.session_state.pred_df, image_ids, class_colors, st.session_state.size, st.session_state.anno)
 
     elif option == "test images":
         with st.sidebar.form(key="form"):
@@ -169,8 +191,10 @@ elif menu == "객체 탐지 확인하기":
                 st.sidebar.error("csv file load failed :(")
 
         image_count = st.sidebar.slider('Select image count', 1, 8, 4)
-        image_id = st.sidebar.slider('Select image id', 0, st.session_state.test_df["image_id"].nunique() - (5 * image_count), 0)
-        st.sidebar.write('image id:', image_id)
-        for i in range(image_id, image_id + 5 * image_count, image_count):
+        image_index = st.sidebar.slider('Select image id', 0, st.session_state.test_df["image_id"].nunique() - (5 * image_count), 0)
+        image_index_input = st.sidebar.number_input('Enter image count', min_value=0, max_value=len(st.session_state.image_ids) - (5 * image_count), value=image_index)
+        if image_index != image_index_input:
+            image_index = image_index_input
+        for i in range(image_index, image_index + 5 * image_count, image_count):
             image_ids = [f"test/{str(j).zfill(4)}.jpg" for j in range(i, i + image_count)]
             visualize_detection.show(st.session_state.test_df, image_ids, class_colors)

@@ -4,6 +4,7 @@
 /baseline
 /dataset
 /work_dirs
+/wandb
 *.csv
 
 # Byte-compiled / optimized / DLL files
@@ -137,3 +138,5 @@ mmdetection
 work_dir
 
 visualizations
+
+mae_pretrain_vit_base.pth
