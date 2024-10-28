@@ -1,0 +1,1 @@
+python our_code/inference.py --config work_dir/co_detr_skfold_1st/exp_configs_co_detr.py --checkpoint work_dir/co_detr_skfold_1st/best_coco_bbox_mAP_50_epoch_27.pth --output work_dir/co_detr_skfold_1st/val_5fold_1st_output.csv
